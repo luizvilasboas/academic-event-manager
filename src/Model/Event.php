@@ -1,6 +1,6 @@
 <?php
 
-namespace Olooeez\AcademicEventManager\Models;
+namespace Olooeez\AcademicEventManager\Model;
 
 class Event
 {

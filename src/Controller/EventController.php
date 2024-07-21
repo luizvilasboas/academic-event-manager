@@ -2,7 +2,7 @@
 
 namespace Olooeez\AcademicEventManager\Controller;
 
-use Olooeez\AcademicEventManager\Models\Event;
+use Olooeez\AcademicEventManager\Model\Event;
 use Olooeez\AcademicEventManager\Config\Database;
 
 use PDO;

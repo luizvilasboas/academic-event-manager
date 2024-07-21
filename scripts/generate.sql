@@ -1,6 +1,6 @@
 -- Criar banco de dados
-CREATE DATABASE IF NOT EXISTS academic_events;
-USE academic_events;
+CREATE DATABASE IF NOT EXISTS academic_event;
+USE academic_event;
 
 -- Tabela de usuários
 CREATE TABLE users (
@@ -58,7 +58,6 @@ CREATE TABLE scores (
 );
 
 -- Trigger para prevenir conflitos de horário
-DELIMITER //
 CREATE TRIGGER prevent_time_conflict
 BEFORE INSERT ON registrations
 FOR EACH ROW
@@ -77,8 +76,6 @@ BEGIN
         SET MESSAGE_TEXT = 'Time conflict detected. Cannot register for this course.';
     END IF;
 END;
-//
-DELIMITER ;
 
 -- View para relatórios
 -- Relatório de todos os usuários cadastrados

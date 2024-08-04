@@ -1,1 +1,5 @@
+# Composer vendor folder
 /vendor/
+
+# MySQL data folder
+/.mysql-data/

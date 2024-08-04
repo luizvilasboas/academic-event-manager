@@ -2,19 +2,16 @@
 
 namespace Olooeez\AcademicEventManager\Controller;
 
-use Olooeez\AcademicEventManager\Config\Database;
 use Olooeez\AcademicEventManager\Model\User;
+use Olooeez\AcademicEventManager\Helper\Auth;
 
 class AuthController
 {
-    private $database;
     private $user;
 
-    public function __construct()
+    public function __construct(\PDO $connection)
     {
-        $database = new Database();
-        $this->database = $database->getConnection();
-        $this->user = new User($this->database);
+        $this->user = new User($connection);
     }
 
     public function login()
@@ -30,15 +27,16 @@ class AuthController
             $user_row = $this->user->checkCredentials();
 
             if ($user_row) {
-                $jwt = $this->user->generateJWT($user_row['id']);
+                $auth = new Auth();
+                $jwt = $auth->generateJWT($user_row["id"], $user_row["email"]);
                 echo json_encode(["token" => $jwt]);
             } else {
                 http_response_code(401);
-                echo json_encode(["message" => "Invalid credentials."]);
+                echo json_encode(["message" => "Invalid credentials"]);
             }
         } else {
             http_response_code(400);
-            echo json_encode(["message" => "Unable to login. Data is incomplete."]);
+            echo json_encode(["message" => "Unable to login. Data is incomplete"]);
         }
     }
 
@@ -61,14 +59,14 @@ class AuthController
 
             if ($this->user->create()) {
                 http_response_code(201);
-                echo json_encode(["message" => "User registered successfully."]);
+                echo json_encode(["message" => "User registered successfully"]);
             } else {
                 http_response_code(500);
-                echo json_encode(["message" => "Unable to register user."]);
+                echo json_encode(["message" => "Unable to register user"]);
             }
         } else {
             http_response_code(400);
-            echo json_encode(["message" => "Unable to register. Data is incomplete."]);
+            echo json_encode(["message" => "Unable to register. Data is incomplete"]);
         }
     }
 }

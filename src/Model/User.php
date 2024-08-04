@@ -2,10 +2,6 @@
 
 namespace Olooeez\AcademicEventManager\Model;
 
-use \Firebase\JWT\JWT;
-
-use Olooeez\AcademicEventManager\Config\JwtConfig;
-
 class User
 {
     private $connection;
@@ -16,12 +12,12 @@ class User
     public $password;
     public $registration;
 
-    public function __construct($database)
+    public function __construct(\PDO $database)
     {
         $this->connection = $database;
     }
 
-    public function checkCredentials()
+    public function checkCredentials(): array|bool
     {
         $query = "SELECT id, email, password FROM {$this->table} WHERE email = :email LIMIT 0,1";
         $stmt = $this->connection->prepare($query);
@@ -37,40 +33,48 @@ class User
         return false;
     }
 
-    public function generateJWT($user_id)
-    {
-        $issuedAt = time();
-        $expirationTime = $issuedAt + 3600;
-        $payload = [
-            "iat" => $issuedAt,
-            "exp" => $expirationTime,
-            "userId" => $user_id
-        ];
-
-        $jwt = JWT::encode($payload, JwtConfig::getSecretKey(), JwtConfig::getAlgortithm());
-        return $jwt;
-    }
-
     public function create()
     {
         $query = "INSERT INTO {$this->table} (name, email, password, registration) VALUES (:name, :email, :password, :registration)";
         $stmt = $this->connection->prepare($query);
 
-        // Limpa e vincula os dados
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->email = htmlspecialchars(strip_tags($this->email));
         $this->password = htmlspecialchars(strip_tags($this->password));
         $this->registration = htmlspecialchars(strip_tags($this->registration));
 
-        $stmt->bindParam(':name', $this->name);
-        $stmt->bindParam(':email', $this->email);
-        $stmt->bindParam(':password', $this->password);
-        $stmt->bindParam(':registration', $this->registration);
+        $stmt->bindParam(":name", $this->name);
+        $stmt->bindParam(":email", $this->email);
+        $stmt->bindParam(":password", $this->password);
+        $stmt->bindParam(":registration", $this->registration);
 
         if ($stmt->execute()) {
             return true;
         }
 
         return false;
+    }
+
+    public function update(): bool
+    {
+        $sql = "UPDATE " . $this->table . " SET name = :name, email = :email, password = :password WHERE id = :id";
+        $stmt = $this->connection->prepare($sql);
+
+        $stmt->bindParam(":name", $this->name);
+        $stmt->bindParam(":email", $this->email);
+        $stmt->bindParam(":password", $this->password);
+        $stmt->bindParam(":id", $this->id);
+
+        return $stmt->execute();
+    }
+
+    public function readOne(int $id): array
+    {
+        $sql = "SELECT * FROM " . $this->table . " WHERE id = :id";
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindParam(":id", $id);
+        $stmt->execute();
+
+        return $stmt->fetch(\PDO::FETCH_ASSOC);
     }
 }

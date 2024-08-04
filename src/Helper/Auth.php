@@ -2,27 +2,44 @@
 
 namespace Olooeez\AcademicEventManager\Helper;
 
-use Olooeez\AcademicEventManager\Config\JwtConfig;
-use \Firebase\JWT\JWT;
+use Olooeez\AcademicEventManager\Model\User;
 
-class Auth {
-    public static function authenticate() {
-        $headers = getallheaders();
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
-        if (isset($headers["Authorization"])) {
-            $token = str_replace("Bearer ", "", $headers["Authorization"]);
-            try {
-                $decoded = JWT::decode($token, JwtConfig::getSecretKey(), [JwtConfig::getAlgortithm()]);
-                return $decoded->userId;
-            } catch (\Exception $e) {
-                http_response_code(401);
-                echo json_encode(["message" => "Access denied."]);
-                exit();
-            }
-        } else {
-            http_response_code(401);
-            echo json_encode(["message" => "Access denied."]);
-            exit();
+class Auth
+{
+    private string $secretKey;
+    private string $algorithm;
+
+    public function __construct(string $secretKey = "temp", string $algorithm = "HS256")
+    {
+        $this->secretKey = $secretKey;
+        $this->algorithm = $algorithm;
+    }
+
+    public function generateJWT(int $id, string $email): string
+    {
+        $payload = [
+            "iss" => "yourdomain.com",
+            "aud" => "yourdomain.com",
+            "iat" => time(),
+            "exp" => time() + (60 ** 7),
+            "sub" => $id,
+            "email" => $email
+        ];
+
+        return JWT::encode($payload, $this->secretKey, $this->algorithm);
+    }
+
+    public function validateJWT(string $jwt): array | bool
+    {
+        try {
+            $decoded = JWT::decode($jwt, new Key($this->secretKey, $this->algorithm));
+            return (array) $decoded;
+        } catch (\Exception $e) {
+            return false;
         }
     }
 }
+?>

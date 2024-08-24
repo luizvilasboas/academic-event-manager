@@ -155,7 +155,7 @@ switch ($segments[0]) {
             sendJsonResponse(401, ["message" => "Not authorized"]);
         }
         break;
-    case "me":
+    case "user":
         if ($token == null) {
             sendJsonResponse(401, ["message" => "Not authorized"]);
         }
@@ -165,15 +165,22 @@ switch ($segments[0]) {
         $userId = $jwt_values["sub"];
 
         if ($jwt_values) {
-            $controller = new UserController($connection);
-
-            $method === "GET" ? $controller->getUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-
             switch ($segments[1]) {
+                case "me":
+                    $controller = new UserController($connection);
+
+                    $method === "GET" ? $controller->getUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+                    break;
                 case "courses":
                     $controller = new CourseController($connection);
                     $method === "GET" ? $controller->getCoursesFromStudent($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
                     break;
+                case "events":
+                    $controller = new EventController($connection);
+                    $method === "GET" ? $controller->getEventFromStudent($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+                    break;
+                default:
+                    sendJsonResponse(404, ["message" => "Action not found"]);
             }
         } else {
             sendJsonResponse(401, ["message" => "Not authorized"]);

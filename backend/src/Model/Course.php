@@ -74,15 +74,16 @@ class Course
         return $stmt->execute();
     }
 
-    public function getCoursesByUser($userId): array
+    public function getCoursesByUser(int $userId): array
     {
-        $sql = "SELECT courses.* FROM {$this->table} 
-                JOIN enrollments ON courses.id = enrollments.course_id 
-                WHERE enrollments.user_id = :user_id";
+        $sql = "SELECT *
+                FROM {$this->table} c
+                JOIN registrations r ON c.id = r.course_id
+                WHERE r.student_id = :user_id";
         $stmt = $this->connection->prepare($sql);
-        $stmt->bindParam(":user_id", $userId);
+        $stmt->bindParam(":user_id", $userId, \PDO::PARAM_INT);
         $stmt->execute();
-
+    
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }
+    }    
 }

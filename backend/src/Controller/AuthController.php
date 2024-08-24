@@ -49,12 +49,10 @@ class AuthController
         if (
             !empty($data->name) &&
             !empty($data->email) &&
-            !empty($data->registration) &&
             !empty($data->password)
         ) {
             $this->user->name = $data->name;
             $this->user->email = $data->email;
-            $this->user->registration = $data->registration;
             $this->user->password = password_hash($data->password, PASSWORD_BCRYPT);
 
             if ($this->user->create()) {

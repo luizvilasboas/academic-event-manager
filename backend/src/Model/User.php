@@ -10,7 +10,6 @@ class User
     public $name;
     public $email;
     public $password;
-    public $registration;
 
     public function __construct(\PDO $database)
     {
@@ -35,18 +34,16 @@ class User
 
     public function create()
     {
-        $query = "INSERT INTO {$this->table} (name, email, password, registration) VALUES (:name, :email, :password, :registration)";
+        $query = "INSERT INTO {$this->table} (name, email, password) VALUES (:name, :email, :password)";
         $stmt = $this->connection->prepare($query);
 
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->email = htmlspecialchars(strip_tags($this->email));
         $this->password = htmlspecialchars(strip_tags($this->password));
-        $this->registration = htmlspecialchars(strip_tags($this->registration));
 
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":password", $this->password);
-        $stmt->bindParam(":registration", $this->registration);
 
         if ($stmt->execute()) {
             return true;

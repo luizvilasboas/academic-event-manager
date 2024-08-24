@@ -41,5 +41,16 @@ class UserController
     public function getUser(int $id)
     {
         header("Content-Type: application/json");
+
+        $userData = $this->user->readOne($id);
+
+        if ($userData) {
+            unset($userData["password"]);
+            http_response_code(200);
+            echo json_encode($userData);
+        } else {
+            http_response_code(404);
+            echo json_encode(["message" => "User not found"]);
+        }
     }
 }

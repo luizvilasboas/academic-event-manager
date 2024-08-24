@@ -1,44 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import { FaCalendarAlt, FaInfoCircle } from "react-icons/fa";
+import useEvent from "../hooks/useEvent";
 import usePagination from "../hooks/usePagination";
 
-const events = [
-  {
-    id: 1,
-    name: "Seminário de Algoritmos",
-    description: "Um seminário sobre as últimas novidades em algoritmos.",
-    date: "2024-08-15",
-  },
-  {
-    id: 2,
-    name: "Workshop de Matemática Discreta",
-    description:
-      "Um workshop para aprofundar o conhecimento em matemática discreta.",
-    date: "2024-09-10",
-  },
-  {
-    id: 3,
-    name: "Conferência de Sistemas Operacionais",
-    description: "Uma conferência sobre sistemas operacionais modernos.",
-    date: "2024-10-05",
-  },
-  {
-    id: 4,
-    name: "Simpósio de Bancos de Dados",
-    description: "Um simpósio sobre os avanços em bancos de dados.",
-    date: "2024-11-20",
-  },
-  {
-    id: 5,
-    name: "Webinar de Redes de Computadores",
-    description:
-      "Um webinar sobre as novas tendências em redes de computadores.",
-    date: "2024-12-02",
-  },
-];
-
 const Events = () => {
+  const { events, listEvents } = useEvent();
+
+  useEffect(() => {
+    listEvents();
+  }, [listEvents]);
+
   const eventsPerPage = 3;
 
   const {
@@ -55,7 +28,8 @@ const Events = () => {
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
         {currentEvents.map((event) => (
-          <div
+          <Link
+            to={`/events/${event.id}`}
             key={event.id}
             className="bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 rounded-lg shadow-lg p-6 transform hover:scale-105 transition-transform duration-300"
           >
@@ -66,9 +40,9 @@ const Events = () => {
             <p className="text-white mb-4">{event.description}</p>
             <p className="text-lg font-bold text-white flex items-center">
               <FaCalendarAlt className="mr-2" />
-              Data: <span className="ml-2">{event.date}</span>
+              Data: <span className="ml-2">{event.start_date}</span>
             </p>
-          </div>
+          </Link>
         ))}
       </div>
       <Pagination

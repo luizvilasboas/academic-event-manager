@@ -7,9 +7,11 @@ import {
   FaSearch,
   FaUserCircle,
 } from "react-icons/fa";
+import useAuth from "../hooks/useAuth";
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { user, loading, logout } = useAuth();
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -66,7 +68,9 @@ const Header = () => {
               className="cursor-pointer text-white flex items-center space-x-2"
             >
               <FaUserCircle className="w-10 h-10" />
-              <span className="hidden sm:block text-lg">Profile</span>
+              <span className="hidden sm:block text-lg">
+                {loading ? "Carregando..." : user?.name || "Usuário não logado"}
+              </span>
             </div>
 
             {dropdownOpen && (
@@ -78,13 +82,13 @@ const Header = () => {
                 >
                   Meu Perfil
                 </Link>
-                <Link
+                <div
                   to="/logout"
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={closeDropdown}
+                  onClick={() => logout()}
                 >
                   Logout
-                </Link>
+                </div>
               </div>
             )}
           </div>

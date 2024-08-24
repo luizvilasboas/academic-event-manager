@@ -94,4 +94,34 @@ class Event
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public function getByIdWithCourses(int $id): ?array
+    {
+        $sql = "SELECT id, name, description, start_date, end_date 
+                FROM {$this->table} 
+                WHERE id = :id";
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        $event = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$event) {
+            return null;
+        }
+
+        $sqlCourses = "SELECT id, title, description, start_time, end_time
+                       FROM courses
+                       WHERE event_id = :event_id";
+        $stmtCourses = $this->connection->prepare($sqlCourses);
+        $stmtCourses->bindParam(':event_id', $id, \PDO::PARAM_INT);
+        $stmtCourses->execute();
+
+        $courses = $stmtCourses->fetchAll(\PDO::FETCH_ASSOC);
+
+        $event['courses'] = $courses;
+
+        return $event;
+    }
+
 }

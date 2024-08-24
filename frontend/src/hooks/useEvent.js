@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import axios from "axios";
 
 const useEvent = () => {
@@ -6,7 +6,7 @@ const useEvent = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [fetched, setFetched] = useState(false); // New state to track if events have been fetched
+  const [fetched, setFetched] = useState(false);
 
   const getAuthToken = () => {
     return localStorage.getItem("token");
@@ -35,10 +35,10 @@ const useEvent = () => {
     }
   }, [fetched]);
 
-  const getEvent = async (id) => {
+  const getEvent = useCallback(async (id) => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/event/${id}`, {
+      const response = await axios.get(`http://localhost:8000/event/${id}`, {
         headers: getAuthHeader(),
       });
       setEvent(response.data);
@@ -48,23 +48,14 @@ const useEvent = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const createEvent = async (eventData) => {
-    setLoading(true);
-    try {
-      const response = await axios.post("/api/event", eventData, {
-        headers: getAuthHeader(),
-      });
-      setEvent(response.data);
-      setError(null);
-      await listEvents();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    // Lista os eventos na primeira renderização
+    if (!fetched) {
+      listEvents();
     }
-  };
+  }, [fetched, listEvents]);
 
   return {
     events,
@@ -73,7 +64,6 @@ const useEvent = () => {
     error,
     listEvents,
     getEvent,
-    createEvent,
   };
 };
 

@@ -1,45 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import useEvent from "../hooks/useEvent";
-import {
-  FaArrowLeft,
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaClock,
-  FaBook,
-} from "react-icons/fa";
+import { FaArrowLeft, FaCalendarAlt, FaClock, FaBook } from "react-icons/fa";
 
 const EventDetail = () => {
   const { id } = useParams();
-  const { events, listEvents } = useEvent();
-  const [event, setEvent] = useState(null);
-  const [associatedCourses, setAssociatedCourses] = useState([]);
+  const { event, getEvent } = useEvent();
 
   useEffect(() => {
-    listEvents();
-  }, [listEvents]);
-
-  useEffect(() => {
-    const selectedEvent = events.find((event) => event.id === parseInt(id));
-    setEvent(selectedEvent);
-  }, [events, id]);
+    if (id) {
+      getEvent(id);
+    }
+  }, [id, getEvent]);
 
   if (!event) {
     return <p>Carregando...</p>;
   }
-
-  const courses = [
-    {
-      id: 3,
-      title: "Curso de Inteligência Artificial com Python",
-      description: "Explore conceitos de IA usando a linguagem Python.",
-    },
-    {
-      id: 4,
-      title: "Curso de Data Science para Iniciantes",
-      description: "Entenda como aplicar ciência de dados no mundo real.",
-    },
-  ];
 
   return (
     <div className="max-w-6xl mx-auto mt-16 p-10">
@@ -70,30 +46,23 @@ const EventDetail = () => {
           <FaCalendarAlt className="text-blue-500 w-8 h-8 mr-4" />
           <div>
             <h4 className="text-lg font-semibold">Data de Início</h4>
-            <p className="text-gray-700">{event.date || "A definir"}</p>
+            <p className="text-gray-700">{event.start_date || "A definir"}</p>
           </div>
         </div>
         <div className="flex items-center bg-purple-100 p-6 rounded-lg shadow-md">
           <FaClock className="text-purple-500 w-8 h-8 mr-4" />
           <div>
-            <h4 className="text-lg font-semibold">Horário</h4>
-            <p className="text-gray-700">{event.time || "A definir"}</p>
-          </div>
-        </div>
-        <div className="flex items-center bg-green-100 p-6 rounded-lg shadow-md">
-          <FaMapMarkerAlt className="text-green-500 w-8 h-8 mr-4" />
-          <div>
-            <h4 className="text-lg font-semibold">Local</h4>
-            <p className="text-gray-700">{event.location || "A definir"}</p>
+            <h4 className="text-lg font-semibold">Data de término</h4>
+            <p className="text-gray-700">{event.end_date || "A definir"}</p>
           </div>
         </div>
       </div>
 
-      {courses.length > 0 && (
+      {event.courses.length > 0 && (
         <div className="mt-12">
           <h3 className="text-3xl font-semibold mb-6">Cursos Associados</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {courses.map((course) => (
+          <div className="flex gap-8">
+            {event.courses.map((course) => (
               <div
                 key={course.id}
                 className="bg-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300"

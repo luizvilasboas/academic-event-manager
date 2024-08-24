@@ -64,6 +64,12 @@ switch ($segments[0]) {
         }
         if ($auth->validateJWT($token)) {
             $controller = new EventController($connection);
+
+            if (is_numeric($segments[1])) {
+                $method === "GET" ? $controller->getEventById((int) $segments[1]) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+                break;
+            }
+
             switch ($segments[1]) {
                 case "create":
                     $method === "POST" ? $controller->create() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);

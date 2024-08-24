@@ -9,6 +9,22 @@ use Olooeez\AcademicEventManager\Config\Database;
 use Olooeez\AcademicEventManager\Controller\UserController;
 use Olooeez\AcademicEventManager\Helper\Auth;
 
+if (isset($_SERVER['HTTP_ORIGIN'])) {
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Max-Age: 86400');
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+    
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
+        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+
+    exit;
+}
+
 function sendJsonResponse($code, $message)
 {
     http_response_code($code);
@@ -48,7 +64,7 @@ switch ($segments[0]) {
         }
         if ($auth->validateJWT($token)) {
             $controller = new EventController($connection);
-            switch ($segments) {
+            switch ($segments[1]) {
                 case "create":
                     $method === "POST" ? $controller->create() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
                     break;
@@ -146,6 +162,8 @@ switch ($segments[0]) {
 
         $jwt_values = $auth->validateJWT($token);
 
+        $userId = $jwt_values["sub"];
+
         if ($jwt_values) {
             $controller = new UserController($connection);
 
@@ -154,9 +172,6 @@ switch ($segments[0]) {
             switch ($segments[1]) {
                 case "courses":
                     $controller = new CourseController($connection);
-
-                    $userId = $jwt_values["sub"];
-
                     $method === "GET" ? $controller->getCoursesFromStudent($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
                     break;
             }

@@ -7,7 +7,6 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    registration VARCHAR(20) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     is_admin BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -80,7 +79,7 @@ END;
 -- View para relatórios
 -- Relatório de todos os usuários cadastrados
 CREATE VIEW report_users AS
-SELECT id, name, email, registration, created_at FROM users;
+SELECT id, name, email, created_at FROM users;
 
 -- Relatório de todos os eventos e cursos cadastrados
 CREATE VIEW report_events_courses AS

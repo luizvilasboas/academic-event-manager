@@ -1,10 +1,10 @@
 -- Adicionar usuários
-INSERT INTO users (name, email, registration, password, is_admin) VALUES 
-('João da Silva', 'joao.silva@example.com', '20210001', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
-('Maria de Souza', 'maria.souza@example.com', '20210002', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
-('Pedro Almeida', 'pedro.almeida@example.com', '20210003', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
-('Ana Costa', 'ana.costa@example.com', '20210004', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
-('Lucas Pereira', 'lucas.pereira@example.com', '20210005', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE);
+INSERT INTO users (name, email, password, is_admin) VALUES 
+('João da Silva', 'joao.silva@example.com', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
+('Maria de Souza', 'maria.souza@example.com', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
+('Pedro Almeida', 'pedro.almeida@example.com', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
+('Ana Costa', 'ana.costa@example.com', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
+('Lucas Pereira', 'lucas.pereira@example.com', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE);
 
 -- Adicionar eventos
 INSERT INTO events (name, description, start_date, end_date) VALUES 

@@ -115,6 +115,11 @@ switch ($segments[0]) {
             if (is_numeric($segments[1])) {
                 $courseId = (int) $segments[1];
 
+                if (!isset($segments[2])) {
+                    $method === "GET" ? $controller->getCourseById($courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+                    break;
+                }
+
                 if ($token == null) {
                     sendJsonResponse(401, ["message" => "Not authorized"]);
                 }

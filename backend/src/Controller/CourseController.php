@@ -140,4 +140,31 @@ class CourseController
         http_response_code(200);
         echo json_encode($courses);
     }
+
+    public function getCourseById(int $id)
+    {
+        header("Content-Type: application/json");
+    
+        if (!$id) {
+            http_response_code(400);
+            echo json_encode(["message" => "Course ID is required"]);
+            return;
+        }
+    
+        try {
+            $course = $this->course->readOne($id);
+    
+            if (!$course) {
+                http_response_code(404);
+                echo json_encode(["message" => "Course not found"]);
+                return;
+            }
+    
+            http_response_code(200);
+            echo json_encode($course);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(["message" => "An error occurred while retrieving the course", "error" => $e->getMessage()]);
+        }
+    }
 }

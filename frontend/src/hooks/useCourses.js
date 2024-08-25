@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useCallback } from 'react';
 
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [fetched, setFetched] = useState(false);
+  const [fetchedCourses, setFetchedCourses] = useState(false);
+  const [fetchedCourseById, setFetchedCourseById] = useState({});
 
   const getAuthToken = () => {
     return localStorage.getItem('token');
@@ -18,8 +18,8 @@ const useCourses = () => {
     return token ? { Authorization: `Bearer ${token}` } : {};
   };
 
-  const listCourses = useCallback(async () => {
-    if (fetched) return;
+  const listCourses = async () => {
+    if (fetchedCourses) return;
 
     setLoading(true);
     try {
@@ -27,22 +27,7 @@ const useCourses = () => {
         headers: getAuthHeader(),
       });
       setCourses(response.data);
-      setError(null);
-      setFetched(true);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [fetched]);
-
-  const getCourse = async (id) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`/api/courses/${id}`, {
-        headers: getAuthHeader(),
-      });
-      setCourse(response.data);
+      setFetchedCourses(true);
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -51,15 +36,17 @@ const useCourses = () => {
     }
   };
 
-  const createCourse = async (courseData) => {
+  const getCourse = async (id) => {
+    if (fetchedCourseById[id]) return; // Se o curso já foi buscado, evita nova chamada.
+
     setLoading(true);
     try {
-      const response = await axios.post('/api/courses', courseData, {
+      const response = await axios.get(`http://localhost:8000/course/${id}`, {
         headers: getAuthHeader(),
       });
       setCourse(response.data);
+      setFetchedCourseById((prev) => ({ ...prev, [id]: true })); // Marca o curso como já buscado.
       setError(null);
-      await listCourses();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -74,7 +61,6 @@ const useCourses = () => {
     error,
     listCourses,
     getCourse,
-    createCourse,
   };
 };
 

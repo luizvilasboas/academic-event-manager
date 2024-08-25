@@ -6,6 +6,7 @@ use Olooeez\AcademicEventManager\Controller\AuthController;
 use Olooeez\AcademicEventManager\Controller\CourseController;
 use Olooeez\AcademicEventManager\Controller\EventController;
 use Olooeez\AcademicEventManager\Config\Database;
+use Olooeez\AcademicEventManager\Controller\ScoresController;
 use Olooeez\AcademicEventManager\Controller\UserController;
 use Olooeez\AcademicEventManager\Helper\Auth;
 
@@ -18,7 +19,7 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-    
+
     if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
         header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
 
@@ -106,7 +107,7 @@ switch ($segments[0]) {
         }
 
         $jwt_values = $auth->validateJWT($token);
-                
+
         if ($jwt_values) {
             $userId = $jwt_values["sub"];
 
@@ -197,6 +198,15 @@ switch ($segments[0]) {
             sendJsonResponse(401, ["message" => "Not authorized"]);
         }
 
+        break;
+    case "scores":
+        if ($token == null) {
+            sendJsonResponse(401, ["message" => "Not authorized"]);
+        }
+
+        $controller = new ScoresController($connection);
+
+        $method === "GET" ? $controller->getScores() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
         break;
     default:
         sendJsonResponse(404, ["message" => "Controller not found"]);

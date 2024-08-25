@@ -1,62 +1,66 @@
-import { useState, useCallback } from "react";
-
-// Simulação de dados para cursos e eventos do usuário
-const mockUser = {
-  name: "João Silva",
-  email: "joao.silva@example.com",
-};
-
-const mockCourses = [
-  {
-    id: 1,
-    title: "Introdução à Programação",
-    description: "Aprenda os conceitos básicos de programação.",
-  },
-  {
-    id: 2,
-    title: "Algoritmos Avançados",
-    description: "Um curso para desenvolver habilidades em algoritmos e estruturas de dados.",
-  },
-];
-
-const mockEvents = [
-  {
-    id: 1,
-    title: "Semana da Tecnologia",
-    description: "Um evento com palestras e workshops sobre tecnologia.",
-  },
-  {
-    id: 2,
-    title: "Hackathon 2024",
-    description: "Participe do maior hackathon da região.",
-  },
-];
+import { useState, useCallback, useEffect } from "react";
+import axios from "axios";
 
 const useUser = () => {
-  const [user, setUser] = useState(mockUser);
+  const [user, setUser] = useState(null);
   const [courses, setCourses] = useState([]);
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const listUserCourses = useCallback(async () => {
-    // Aqui você poderia fazer uma chamada para uma API para buscar os cursos do usuário
-    // const response = await api.get('/user/courses');
-    // setCourses(response.data);
-    setCourses(mockCourses); // Usando mock para simular a resposta da API
-    return mockCourses;
-  }, []);
+  const getAuthToken = () => {
+    return localStorage.getItem("token");
+  };
 
-  const listUserEvents = useCallback(async () => {
-    // Aqui você poderia fazer uma chamada para uma API para buscar os eventos do usuário
-    // const response = await api.get('/user/events');
-    // setEvents(response.data);
-    setEvents(mockEvents); // Usando mock para simular a resposta da API
-    return mockEvents;
+  const getAuthHeader = () => {
+    const token = getAuthToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const config = {
+          headers: getAuthHeader(),
+        };
+
+        const { data: userData } = await axios.get(
+          "http://localhost:8000/user/me",
+          config
+        );
+
+        setUser(userData);
+
+        const { data: coursesData } = await axios.get(
+          "http://localhost:8000/user/courses",
+          config
+        );
+        const { data: eventsData } = await axios.get(
+          "http://localhost:8000/user/events",
+          config
+        );
+
+        setCourses(coursesData);
+        setEvents(eventsData);
+      } catch (err) {
+        setError("Erro ao carregar as informações do usuário.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
   }, []);
 
   return {
     user,
-    listUserCourses,
-    listUserEvents,
+    courses,
+    events,
+    loading,
+    error,
   };
 };
 

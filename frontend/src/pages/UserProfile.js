@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaBook, FaCalendarAlt, FaEdit } from "react-icons/fa";
 import useUser from "../hooks/useUser";
+import useAuth from "../hooks/useAuth";
 import Modal from "../components/Modal";
 
 const UserProfile = () => {
-  const { user, listUserCourses, listUserEvents, updateUser } = useUser();
+  const { listUserCourses, listUserEvents, updateUser } = useUser();
+  const { user, loading } = useAuth();
   const [courses, setCourses] = useState([]);
   const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,10 +53,10 @@ const UserProfile = () => {
 
       <div className="text-4xl font-bold mb-12 flex gap-5">
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
-          {user.name}
+          {loading ? user.name : "carregando"}
         </span>
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-teal-500">
-          {user.email}
+          {loading ? user.email : "carregando"}
         </span>
       </div>
 

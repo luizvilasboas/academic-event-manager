@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 
-// Mock de dados
 const mockUsers = [
   { id: 1, name: "João Silva", email: "joao.silva@example.com" },
   { id: 2, name: "Maria Oliveira", email: "maria.oliveira@example.com" },
@@ -39,7 +38,7 @@ const useAdmin = () => {
   const [users, setUsers] = useState(mockUsers);
   const [courses, setCourses] = useState(mockCourses);
   const [events, setEvents] = useState(mockEvents);
-  const [registrations, setRegistrations] = useState(mockRegistrations);
+  const [registrations] = useState(mockRegistrations);
 
   const getUsers = useCallback(() => users, [users]);
   const getCourses = useCallback(() => courses, [courses]);

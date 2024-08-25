@@ -26,7 +26,7 @@ const useAuth = () => {
     const token = getAuthToken();
     if (token) {
       try {
-        const response = await axios.get("http://localhost:8000/me", {
+        const response = await axios.get("http://localhost:8000/user/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(response.data);

@@ -24,7 +24,7 @@ const AdminPanel = () => {
   const [users, setUsers] = useState([]);
   const [courses, setCourses] = useState([]);
   const [events, setEvents] = useState([]);
-  const [registrations, setRegistrations] = useState([]);
+  const [setRegistrations] = useState([]);
   const [activeTab, setActiveTab] = useState("users");
 
   const [newEvent, setNewEvent] = useState({
@@ -53,7 +53,7 @@ const AdminPanel = () => {
       setRegistrations(fetchedRegistrations);
     };
     fetchData();
-  }, [getUsers, getCourses, getEvents, getRegistrations]);
+  }, [getUsers, getCourses, getEvents, getRegistrations, setRegistrations]);
 
   const handleEventSubmit = (e) => {
     e.preventDefault();

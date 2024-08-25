@@ -82,7 +82,7 @@ class Event
 
     public function getEventsByUser($userId): array
     {
-        $sql = "SELECT * 
+        $sql = "SELECT e.id, e.name, e.description
                 FROM {$this->table} e
                 JOIN courses c ON e.id = c.event_id
                 JOIN registrations r ON c.id = r.course_id

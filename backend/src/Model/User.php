@@ -18,7 +18,7 @@ class User
 
     public function checkCredentials(): array|bool
     {
-        $query = "SELECT id, email, password FROM {$this->table} WHERE email = :email LIMIT 0,1";
+        $query = "SELECT id, name, email, password FROM {$this->table} WHERE email = :email LIMIT 0,1";
         $stmt = $this->connection->prepare($query);
         $stmt->bindParam(":email", $this->email);
         $stmt->execute();

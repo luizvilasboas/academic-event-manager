@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 const useScores = () => {
@@ -10,14 +10,17 @@ const useScores = () => {
     return localStorage.getItem("token");
   };
 
-  const getAuthHeader = () => {
+  const getAuthHeader = useCallback(() => {
     const token = getAuthToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
-  };
+  }, []);
 
   useEffect(() => {
     const fetchScores = async () => {
       try {
+        setLoading(true);
+        setError(null);
+
         const response = await axios.get("http://localhost:8000/scores", {
           headers: getAuthHeader(),
         });
@@ -30,7 +33,7 @@ const useScores = () => {
     };
 
     fetchScores();
-  }, []);
+  }, [getAuthHeader]); // Agora, getAuthHeader é incluída nas dependências de useEffect.
 
   return { scores, loading, error };
 };

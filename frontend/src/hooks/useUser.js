@@ -12,48 +12,78 @@ const useUser = () => {
     return localStorage.getItem("token");
   };
 
-  const getAuthHeader = () => {
+  const getAuthHeader = useCallback(() => {
     const token = getAuthToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
+  }, []); // Agora getAuthHeader é estável e não será recriada.
+
+  const fetchUserInfo = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const config = {
+        headers: getAuthHeader(),
+      };
+
+      const { data: userData } = await axios.get(
+        "http://localhost:8000/user/me",
+        config
+      );
+
+      setUser(userData);
+
+      const { data: coursesData } = await axios.get(
+        "http://localhost:8000/user/courses",
+        config
+      );
+      const { data: eventsData } = await axios.get(
+        "http://localhost:8000/user/events",
+        config
+      );
+
+      setCourses(coursesData);
+      setEvents(eventsData);
+    } catch (err) {
+      setError("Erro ao carregar as informações do usuário.");
+    } finally {
+      setLoading(false);
+    }
+  }, [getAuthHeader]); // Agora getAuthHeader é incluída nas dependências de useCallback.
+
+  const updateUser = async (updatedData) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const config = {
+        headers: getAuthHeader(),
+      };
+
+      const response = await axios.put(
+        "http://localhost:8000/user/me",
+        updatedData,
+        config
+      );
+
+      if (response.status === 200) {
+        setUser(response.data);
+        return { status: true, text: "Perfil atualizado com sucesso." };
+      }
+    } catch (err) {
+      setError("Erro ao atualizar as informações do usuário.");
+      return {
+        status: false,
+        text: "Erro ao atualizar as informações do usuário.",
+      };
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const config = {
-          headers: getAuthHeader(),
-        };
-
-        const { data: userData } = await axios.get(
-          "http://localhost:8000/user/me",
-          config
-        );
-
-        setUser(userData);
-
-        const { data: coursesData } = await axios.get(
-          "http://localhost:8000/user/courses",
-          config
-        );
-        const { data: eventsData } = await axios.get(
-          "http://localhost:8000/user/events",
-          config
-        );
-
-        setCourses(coursesData);
-        setEvents(eventsData);
-      } catch (err) {
-        setError("Erro ao carregar as informações do usuário.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUserInfo();
-  }, []);
+  }, [fetchUserInfo]);
 
   return {
     user,
@@ -61,6 +91,7 @@ const useUser = () => {
     events,
     loading,
     error,
+    updateUser,
   };
 };
 

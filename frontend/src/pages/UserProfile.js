@@ -2,40 +2,47 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaBook, FaCalendarAlt, FaEdit } from "react-icons/fa";
 import useUser from "../hooks/useUser";
-import useAuth from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 import Modal from "../components/Modal";
 
 const UserProfile = () => {
-  const { listUserCourses, listUserEvents, updateUser } = useUser();
+  const { courses, events, updateUser } = useUser();
   const { user, loading } = useAuth();
-  const [courses, setCourses] = useState([]);
-  const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: user.name,
-    email: user.email,
+    name: user?.name || "",
+    email: user?.email || "",
     password: "",
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      const userCourses = await listUserCourses();
-      const userEvents = await listUserEvents();
-      setCourses(userCourses);
-      setEvents(userEvents);
-    };
-    fetchData();
-  }, [listUserCourses, listUserEvents]);
+    if (user) {
+      setFormData({
+        name: user.name,
+        email: user.email,
+        password: "",
+      });
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSaveChanges = () => {
-    updateUser(formData);
+  const handleSaveChanges = async () => {
+    const result = await updateUser(formData);
+    if (result.status) {
+      alert("Perfil atualizado com sucesso.");
+    } else {
+      alert("Erro ao atualizar o perfil.");
+    }
     setIsModalOpen(false);
   };
+
+  if (loading) {
+    return <p>Carregando...</p>;
+  }
 
   return (
     <div className="max-w-6xl mx-auto mt-16 p-10">
@@ -53,10 +60,10 @@ const UserProfile = () => {
 
       <div className="text-4xl font-bold mb-12 flex gap-5">
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
-          {loading ? user.name : "carregando"}
+          {user?.name || "Usuário não encontrado"}
         </span>
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-teal-500">
-          {loading ? user.email : "carregando"}
+          {user?.email || "Email não encontrado"}
         </span>
       </div>
 
@@ -79,9 +86,7 @@ const UserProfile = () => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-700">
-            Você não está cadastrado em nenhum curso.
-          </p>
+          <p className="text-gray-700">Você não está cadastrado em nenhum curso.</p>
         )}
       </div>
 
@@ -97,16 +102,14 @@ const UserProfile = () => {
               >
                 <div className="flex items-center mb-4">
                   <FaCalendarAlt className="w-8 h-8 text-white mr-4" />
-                  <h4 className="text-2xl font-semibold">{event.title}</h4>
+                  <h4 className="text-2xl font-semibold">{event.name}</h4>
                 </div>
                 <p className="text-gray-100">{event.description}</p>
               </Link>
             ))}
           </div>
         ) : (
-          <p className="text-gray-700">
-            Você não está cadastrado em nenhum evento.
-          </p>
+          <p className="text-gray-700">Você não está cadastrado em nenhum evento.</p>
         )}
       </div>
 

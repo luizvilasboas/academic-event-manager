@@ -1,10 +1,10 @@
 -- Adicionar usuários
 INSERT INTO users (name, email, password, is_admin) VALUES 
-('João da Silva', 'joao.silva@example.com', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
-('Maria de Souza', 'maria.souza@example.com', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
-('Pedro Almeida', 'pedro.almeida@example.com', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
-('Ana Costa', 'ana.costa@example.com', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE),
-('Lucas Pereira', 'lucas.pereira@example.com', '$2y$10$abcdefghi1234567890abcdefgHiJklmnopqrstuVwxyz1234567890abc', FALSE);
+('João da Silva', 'joao.silva@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE),
+('Maria de Souza', 'maria.souza@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE),
+('Pedro Almeida', 'pedro.almeida@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE),
+('Ana Costa', 'ana.costa@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE),
+('Lucas Pereira', 'lucas.pereira@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE);
 
 -- Adicionar eventos
 INSERT INTO events (name, description, start_date, end_date) VALUES 

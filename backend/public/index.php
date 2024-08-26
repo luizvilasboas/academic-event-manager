@@ -18,7 +18,7 @@ if (isset($_SERVER['HTTP_ORIGIN'])) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
-        header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PATCH, DELETE");
 
     if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
         header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
@@ -174,12 +174,20 @@ switch ($segments[0]) {
 
         $jwt_values = $auth->validateJWT($token);
 
-        $userId = $jwt_values["sub"];
-
         if ($jwt_values) {
+            $userId = $jwt_values["sub"];
+            
             switch ($segments[1]) {
                 case "me":
                     $controller = new UserController($connection);
+        
+                    if ($segments[2] == "edit") {
+                        $method === "PATCH" ? $controller->updateUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+                        break;
+                    } else if (isset($segments[2])) {
+                        sendJsonResponse(404, ["message" => "Action not found"]);
+                        break;
+                    }
 
                     $method === "GET" ? $controller->getUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
                     break;

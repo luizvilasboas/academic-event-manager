@@ -19,11 +19,11 @@ class EventController
 
         $data = json_decode(file_get_contents("php://input"));
 
-        if (!empty($data->name) && !empty($data->description) && !empty($data->start_date) && !empty($data->end_date)) {
+        if (!empty($data->name) && !empty($data->description) && !empty($data->start_time) && !empty($data->end_time)) {
             $this->event->name = $data->name;
             $this->event->description = $data->description;
-            $this->event->start_date = $data->start_date;
-            $this->event->end_date = $data->end_date;
+            $this->event->start_time = $data->start_time;
+            $this->event->end_time = $data->end_time;
 
             if ($this->event->create()) {
                 http_response_code(201);
@@ -50,8 +50,8 @@ class EventController
                 "id" => $id,
                 "name" => $name,
                 "description" => $description,
-                "start_date" => $start_date,
-                "end_date" => $end_date
+                "start_time" => $start_time,
+                "end_time" => $end_time
             ];
             array_push($events_arr, $event_item);
         }
@@ -65,18 +65,18 @@ class EventController
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        if (isset($data["name"], $data["description"], $data["start_date"], $data["end_date"])) {
+        if (isset($data["name"], $data["description"], $data["start_time"], $data["end_time"])) {
             $this->event->name = $data["name"];
             $this->event->description = $data["description"];
-            $this->event->start_date = $data["start_date"];
-            $this->event->end_date = $data["end_date"];
+            $this->event->start_time = $data["start_time"];
+            $this->event->end_time = $data["end_time"];
 
             if ($this->event->update((int) $id)) {
                 http_response_code(200);
-                echo json_encode(["message" => "Course updated successfully"]);
+                echo json_encode(["message" => "Event updated successfully"]);
             } else {
                 http_response_code(500);
-                echo json_encode(["message" => "Failed to update course"]);
+                echo json_encode(["message" => "Failed to update event"]);
             }
         } else {
             http_response_code(400);
@@ -91,14 +91,14 @@ class EventController
         if ($id) {
             if ($this->event->delete((int) $id)) {
                 http_response_code(200);
-                echo json_encode(["message" => "Course deleted successfully"]);
+                echo json_encode(["message" => "Event deleted successfully"]);
             } else {
                 http_response_code(500);
-                echo json_encode(["message" => "Failed to delete course"]);
+                echo json_encode(["message" => "Failed to delete event"]);
             }
         } else {
             http_response_code(400);
-            echo json_encode(["message" => "Course ID is required"]);
+            echo json_encode(["message" => "Event ID is required"]);
         }
     }
 
@@ -114,12 +114,6 @@ class EventController
 
         try {
             $events = $this->event->getEventsByUser($studentId);
-
-            if (empty($events)) {
-                http_response_code(404);
-                echo json_encode(["message" => "No events found for the specified student"]);
-                return;
-            }
 
             http_response_code(200);
             echo json_encode($events);

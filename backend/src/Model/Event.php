@@ -9,8 +9,8 @@ class Event
     public $id;
     public $name;
     public $description;
-    public $start_date;
-    public $end_date;
+    public $start_time;
+    public $end_time;
 
     public function __construct(\PDO $connection)
     {
@@ -19,18 +19,18 @@ class Event
 
     public function create()
     {
-        $query = "INSERT INTO {$this->table} SET name=:name, description=:description, start_date=:start_date, end_date=:end_date";
+        $query = "INSERT INTO {$this->table} SET name=:name, description=:description, start_time=:start_time, end_time=:end_time";
         $stmt = $this->connection->prepare($query);
 
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->description = htmlspecialchars(strip_tags($this->description));
-        $this->start_date = htmlspecialchars(strip_tags($this->start_date));
-        $this->end_date = htmlspecialchars(strip_tags($this->end_date));
+        $this->start_time = htmlspecialchars(strip_tags($this->start_time));
+        $this->end_time = htmlspecialchars(strip_tags($this->end_time));
 
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":description", $this->description);
-        $stmt->bindParam(":start_date", $this->start_date);
-        $stmt->bindParam(":end_date", $this->end_date);
+        $stmt->bindParam(":start_time", $this->start_time);
+        $stmt->bindParam(":end_time", $this->end_time);
 
         if ($stmt->execute()) {
             return true;
@@ -59,13 +59,13 @@ class Event
 
     public function update(int $id): bool
     {
-        $sql = "UPDATE " . $this->table . " SET name = :name, description = :description, start_date = :start_date, end_date = :end_date WHERE id = :id";
+        $sql = "UPDATE " . $this->table . " SET name = :name, description = :description, start_time = :start_time, end_time = :end_time WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
 
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":description", $this->description);
-        $stmt->bindParam(":start_date", $this->start_date);
-        $stmt->bindParam(":end_date", $this->end_date);
+        $stmt->bindParam(":start_time", $this->start_time);
+        $stmt->bindParam(":end_time", $this->end_time);
         $stmt->bindParam(":id", $id);
 
         return $stmt->execute();
@@ -97,7 +97,7 @@ class Event
 
     public function getByIdWithCourses(int $id): ?array
     {
-        $sql = "SELECT id, name, description, start_date, end_date 
+        $sql = "SELECT id, name, description, start_time, end_time 
                 FROM {$this->table} 
                 WHERE id = :id";
         $stmt = $this->connection->prepare($sql);

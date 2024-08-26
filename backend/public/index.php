@@ -81,7 +81,7 @@ switch ($segments[0]) {
                     } else {
                         sendJsonResponse(405, ["message" => "Course ID not found"]);
                     }
-                    $method === "PUT" ? $controller->update($id) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+                    $method === "PATCH" ? $controller->update($id) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
                     break;
                 case "list":
                     $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
@@ -147,7 +147,7 @@ switch ($segments[0]) {
                     } else {
                         sendJsonResponse(405, ["message" => "Course ID not found"]);
                     }
-                    $method === "PUT" ? $controller->update($id) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+                    $method === "PATCH" ? $controller->update($id) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
                     break;
                 case "list":
                     $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
@@ -176,11 +176,35 @@ switch ($segments[0]) {
 
         if ($jwt_values) {
             $userId = $jwt_values["sub"];
-            
+
+            if (is_numeric($segments[1])) {
+                $controller = new UserController($connection);
+
+                $userId = (int) $segments[1];
+
+                switch ($method) {
+                    case "PATCH":
+                        $controller->updateUser($userId);
+                        break;
+                    case "DELETE":
+                        $controller->deleteUser($userId);
+                        break;
+                    default:
+                        sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+                }
+
+                break;
+            }
+
             switch ($segments[1]) {
+                case "list":
+                    $controller = new UserController($connection);
+
+                    $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+                    break;
                 case "me":
                     $controller = new UserController($connection);
-        
+
                     if (isset($segments[2]) && $segments[2] == "edit") {
                         $method === "PATCH" ? $controller->updateUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
                         break;
@@ -215,6 +239,15 @@ switch ($segments[0]) {
         $controller = new ScoresController($connection);
 
         $method === "GET" ? $controller->getScores() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+        break;
+    case "registration":
+        if ($token == null) {
+            sendJsonResponse(401, ["message" => "Not authorized"]);
+        }
+
+        $controller = new UserController($connection);
+
+        $method === "GET" ? $controller->listUsersWithCourses() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
         break;
     default:
         sendJsonResponse(404, ["message" => "Controller not found"]);

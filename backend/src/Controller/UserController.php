@@ -53,4 +53,47 @@ class UserController
             echo json_encode(["message" => "User not found"]);
         }
     }
+
+    public function deleteUser(int $id)
+    {
+        header("Content-Type: application/json");
+
+        if ($this->user->delete($id)) {
+            http_response_code(200);
+            echo json_encode(["message" => "User deleted successfully"]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["message" => "Failed to delete user"]);
+        }
+    }
+
+    public function read()
+    {
+        header("Content-Type: application/json");
+
+        $users = $this->user->readAll();
+
+        if (!empty($users)) {
+            http_response_code(200);
+            echo json_encode($users);
+        } else {
+            http_response_code(404);
+            echo json_encode(["message" => "Nenhum usuário encontrado."]);
+        }
+    }
+
+    public function listUsersWithCourses()
+    {
+        header("Content-Type: application/json");
+
+        $usersWithCourses = $this->user->getUsersWithCourses();
+
+        if ($usersWithCourses) {
+            http_response_code(200);
+            echo json_encode($usersWithCourses);
+        } else {
+            http_response_code(404);
+            echo json_encode(["message" => "No users found."]);
+        }
+    }
 }

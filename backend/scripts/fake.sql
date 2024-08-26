@@ -7,9 +7,9 @@ INSERT INTO users (name, email, password, is_admin) VALUES
 ('Lucas Pereira', 'lucas.pereira@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE);
 
 -- Adicionar eventos
-INSERT INTO events (name, description, start_date, end_date) VALUES 
-('Semana de Tecnologia', 'Evento com diversas palestras e workshops sobre tecnologia.', '2023-09-01', '2023-09-05'),
-('Semana de Ciências', 'Evento com palestras e cursos sobre ciências naturais.', '2023-10-10', '2023-10-15');
+INSERT INTO events (name, description, start_time, end_time) VALUES 
+('Semana de Tecnologia', 'Evento com diversas palestras e workshops sobre tecnologia.', '2023-09-01 09:00:00', '2023-09-05 18:00:00'),
+('Semana de Ciências', 'Evento com palestras e cursos sobre ciências naturais.', '2023-10-10 09:00:00', '2023-10-15 18:00:00');
 
 -- Adicionar cursos
 INSERT INTO courses (event_id, title, description, start_time, end_time) VALUES 

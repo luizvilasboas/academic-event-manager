@@ -1,107 +1,192 @@
-import { useState, useCallback } from "react";
-
-const mockUsers = [
-  { id: 1, name: "João Silva", email: "joao.silva@example.com" },
-  { id: 2, name: "Maria Oliveira", email: "maria.oliveira@example.com" },
-];
-
-const mockCourses = [
-  { id: 1, title: "Curso de React", description: "Aprenda React do zero", eventId: 1, date: "2024-08-30", time: "14:00" },
-  { id: 2, title: "Curso de Node.js", description: "Desenvolvimento backend com Node.js", eventId: 2, date: "2024-09-05", time: "10:00" },
-];
-
-const mockEvents = [
-  { id: 1, title: "Hackathon 2024", description: "Participe do maior hackathon da região", date: "2024-08-25", time: "09:00" },
-  { id: 2, title: "Semana da Tecnologia", description: "Palestras e workshops sobre tecnologia", date: "2024-09-10", time: "09:00" },
-];
-
-const mockRegistrations = [
-  {
-    studentId: 1,
-    studentName: "João Silva",
-    enrollments: [
-      { id: 1, title: "Curso de React", type: "Curso" },
-      { id: 1, title: "Hackathon 2024", type: "Evento" },
-    ],
-  },
-  {
-    studentId: 2,
-    studentName: "Maria Oliveira",
-    enrollments: [
-      { id: 2, title: "Curso de Node.js", type: "Curso" },
-      { id: 2, title: "Semana da Tecnologia", type: "Evento" },
-    ],
-  },
-];
+import { useState, useCallback, useEffect } from "react";
+import axios from "axios";
 
 const useAdmin = () => {
-  const [users, setUsers] = useState(mockUsers);
-  const [courses, setCourses] = useState(mockCourses);
-  const [events, setEvents] = useState(mockEvents);
-  const [registrations] = useState(mockRegistrations);
+  const [users, setUsers] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const getUsers = useCallback(() => users, [users]);
-  const getCourses = useCallback(() => courses, [courses]);
-  const getEvents = useCallback(() => events, [events]);
-  const getRegistrations = useCallback(() => registrations, [registrations]);
+  const getAuthToken = () => {
+    return localStorage.getItem("token");
+  };
+
+  const getAuthHeader = () => {
+    const token = getAuthToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:8000/user/list", {
+        headers: getAuthHeader(),
+      });
+      setUsers(response.data);
+    } catch (err) {
+      setError("Erro ao buscar usuários.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchCourses = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:8000/course/list", {
+        headers: getAuthHeader(),
+      });
+      setCourses(response.data);
+    } catch (err) {
+      setError("Erro ao buscar cursos.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchEvents = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:8000/event/list", {
+        headers: getAuthHeader(),
+      });
+      setEvents(response.data);
+    } catch (err) {
+      setError("Erro ao buscar eventos.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchRegistrations = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:8000/registration", {
+        headers: getAuthHeader(),
+      });
+      setRegistrations(response.data);
+    } catch (err) {
+      setError("Erro ao buscar inscrições.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const deleteUser = useCallback(
-    (id) => setUsers((prev) => prev.filter((user) => user.id !== id)),
+    async (id) => {
+      try {
+        await axios.delete(`http://localhost:8000/user/${id}`, {
+          headers: getAuthHeader(),
+        });
+      } catch (err) {
+        setError("Erro ao deletar usuário.");
+      }
+    },
     []
   );
 
   const deleteCourse = useCallback(
-    (id) => setCourses((prev) => prev.filter((course) => course.id !== id)),
+    async (id) => {
+      try {
+        await axios.delete(`http://localhost:8000/course/delete/${id}`, {
+          headers: getAuthHeader(),
+        });
+      } catch (err) {
+        setError("Erro ao deletar curso.");
+      }
+    },
     []
   );
 
   const deleteEvent = useCallback(
-    (id) => setEvents((prev) => prev.filter((event) => event.id !== id)),
+    async (id) => {
+      try {
+        await axios.delete(`http://localhost:8000/event/delete/${id}`, {
+          headers: getAuthHeader(),
+        });
+      } catch (err) {
+        setError("Erro ao deletar evento.");
+      }
+    },
     []
   );
 
   const addEvent = useCallback(
-    (newEvent) => {
-      const nextId = events.length ? Math.max(...events.map((event) => event.id)) + 1 : 1;
-      const eventToAdd = { id: nextId, ...newEvent };
-      setEvents((prev) => [...prev, eventToAdd]);
+    async (newEvent) => {
+      try {
+        const response = await axios.post("http://localhost:8000/event/create", newEvent, {
+          headers: getAuthHeader(),
+        });
+      } catch (err) {
+        setError("Erro ao adicionar evento.");
+      }
     },
-    [events]
+    []
   );
 
   const addCourse = useCallback(
-    (newCourse) => {
-      const nextId = courses.length ? Math.max(...courses.map((course) => course.id)) + 1 : 1;
-      const courseToAdd = { id: nextId, ...newCourse };
-      setCourses((prev) => [...prev, courseToAdd]);
+    async (newCourse) => {
+      try {
+        const response = await axios.post("http://localhost:8000/course/create", newCourse, {
+          headers: getAuthHeader(),
+        });
+      } catch (err) {
+        setError("Erro ao adicionar curso.");
+      }
     },
-    [courses]
+    []
   );
 
   const updateEvent = useCallback(
-    (updatedEvent) => {
-      setEvents((prev) =>
-        prev.map((event) => (event.id === updatedEvent.id ? updatedEvent : event))
-      );
+    async (updatedEvent) => {
+      try {
+        const response = await axios.patch(
+          `http://localhost:8000/event/update/${updatedEvent.id}`,
+          updatedEvent,
+          {
+            headers: getAuthHeader(),
+          }
+        );
+      } catch (err) {
+        setError("Erro ao atualizar evento.");
+      }
     },
     []
   );
 
   const updateCourse = useCallback(
-    (updatedCourse) => {
-      setCourses((prev) =>
-        prev.map((course) => (course.id === updatedCourse.id ? updatedCourse : course))
-      );
+    async (updatedCourse) => {
+      try {
+        const response = await axios.patch(
+          `http://localhost:8000/course/update/${updatedCourse.id}`,
+          updatedCourse,
+          {
+            headers: getAuthHeader(),
+          }
+        );
+      } catch (err) {
+        setError("Erro ao atualizar curso.");
+      }
     },
     []
   );
-  
+
+  useEffect(() => {
+    fetchUsers();
+    fetchCourses();
+    fetchEvents();
+    fetchRegistrations();
+  }, [fetchUsers, fetchCourses, fetchEvents, fetchRegistrations]);
 
   return {
-    getUsers,
-    getCourses,
-    getEvents,
-    getRegistrations,
+    users,
+    courses,
+    events,
+    registrations,
+    loading,
+    error,
     deleteUser,
     deleteCourse,
     deleteEvent,

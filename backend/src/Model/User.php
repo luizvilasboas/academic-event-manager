@@ -65,6 +65,15 @@ class User
         return $stmt->execute();
     }
 
+    public function delete(int $id): bool
+    {
+        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
+        $stmt = $this->connection->prepare($query);
+        $stmt->bindParam(":id", $id, \PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
+
     public function readOne(int $id): array
     {
         $sql = "SELECT * FROM " . $this->table . " WHERE id = :id";
@@ -73,5 +82,56 @@ class User
         $stmt->execute();
 
         return $stmt->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    public function readAll(): array
+    {
+        $sql = "SELECT id, name, email FROM " . $this->table;
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getUsersWithCourses(): array
+    {
+        $query = "
+            SELECT 
+                u.id AS user_id, u.name AS user_name, u.email AS user_email,
+                c.id AS course_id, c.title AS course_title, c.description AS course_description
+            FROM 
+                {$this->table} u
+            LEFT JOIN 
+                registrations r ON u.id = r.student_id
+            LEFT JOIN 
+                courses c ON r.course_id = c.id
+            ORDER BY 
+                u.name ASC, c.title ASC
+        ";
+
+        $stmt = $this->connection->prepare($query);
+        $stmt->execute();
+
+        $usersWithCourses = [];
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $userId = $row['user_id'];
+            if (!isset($usersWithCourses[$userId])) {
+                $usersWithCourses[$userId] = [
+                    'id' => $row['user_id'],
+                    'name' => $row['user_name'],
+                    'email' => $row['user_email'],
+                    'courses' => []
+                ];
+            }
+            if ($row['course_id']) {
+                $usersWithCourses[$userId]['courses'][] = [
+                    'id' => $row['course_id'],
+                    'title' => $row['course_title'],
+                    'description' => $row['course_description']
+                ];
+            }
+        }
+
+        return array_values($usersWithCourses);
     }
 }

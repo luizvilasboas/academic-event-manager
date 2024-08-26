@@ -31,7 +31,7 @@ const EventDetail = () => {
         </h2>
         <div className="flex justify-center">
           <Link
-            to={`/events/${id}/register`}
+            to={`/event/${id}/register`}
             className="px-8 py-4 text-xl font-semibold bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full shadow-lg hover:scale-110 transform transition-transform duration-300"
           >
             Inscrever-se no Evento
@@ -73,7 +73,7 @@ const EventDetail = () => {
                 </div>
                 <p className="text-gray-700">{course.description}</p>
                 <Link
-                  to={`/courses/${course.id}/register`}
+                  to={`/course/${course.id}/register`}
                   className="mt-4 inline-block px-6 py-2 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full shadow-md hover:scale-105 transform transition-transform duration-300"
                 >
                   Inscrever-se

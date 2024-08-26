@@ -9,14 +9,14 @@ const useAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const getAuthToken = () => {
+  const getAuthToken = useCallback(() => {
     return localStorage.getItem("token");
-  };
+  }, []);
 
-  const getAuthHeader = () => {
+  const getAuthHeader = useCallback(() => {
     const token = getAuthToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
-  };
+  }, [getAuthToken]);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -30,7 +30,7 @@ const useAdmin = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getAuthHeader]);
 
   const fetchCourses = useCallback(async () => {
     try {
@@ -44,7 +44,7 @@ const useAdmin = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getAuthHeader]);
 
   const fetchEvents = useCallback(async () => {
     try {
@@ -58,7 +58,7 @@ const useAdmin = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getAuthHeader]);
 
   const fetchRegistrations = useCallback(async () => {
     try {
@@ -72,7 +72,7 @@ const useAdmin = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getAuthHeader]);
 
   const deleteUser = useCallback(
     async (id) => {
@@ -84,7 +84,7 @@ const useAdmin = () => {
         setError("Erro ao deletar usuário.");
       }
     },
-    []
+    [getAuthHeader]
   );
 
   const deleteCourse = useCallback(
@@ -97,7 +97,7 @@ const useAdmin = () => {
         setError("Erro ao deletar curso.");
       }
     },
-    []
+    [getAuthHeader]
   );
 
   const deleteEvent = useCallback(
@@ -110,39 +110,39 @@ const useAdmin = () => {
         setError("Erro ao deletar evento.");
       }
     },
-    []
+    [getAuthHeader]
   );
 
   const addEvent = useCallback(
     async (newEvent) => {
       try {
-        const response = await axios.post("http://localhost:8000/event/create", newEvent, {
+        await axios.post("http://localhost:8000/event/create", newEvent, {
           headers: getAuthHeader(),
         });
       } catch (err) {
         setError("Erro ao adicionar evento.");
       }
     },
-    []
+    [getAuthHeader]
   );
 
   const addCourse = useCallback(
     async (newCourse) => {
       try {
-        const response = await axios.post("http://localhost:8000/course/create", newCourse, {
+        await axios.post("http://localhost:8000/course/create", newCourse, {
           headers: getAuthHeader(),
         });
       } catch (err) {
         setError("Erro ao adicionar curso.");
       }
     },
-    []
+    [getAuthHeader]
   );
 
   const updateEvent = useCallback(
     async (updatedEvent) => {
       try {
-        const response = await axios.patch(
+        await axios.patch(
           `http://localhost:8000/event/update/${updatedEvent.id}`,
           updatedEvent,
           {
@@ -153,13 +153,13 @@ const useAdmin = () => {
         setError("Erro ao atualizar evento.");
       }
     },
-    []
+    [getAuthHeader]
   );
 
   const updateCourse = useCallback(
     async (updatedCourse) => {
       try {
-        const response = await axios.patch(
+        await axios.patch(
           `http://localhost:8000/course/update/${updatedCourse.id}`,
           updatedCourse,
           {
@@ -170,7 +170,7 @@ const useAdmin = () => {
         setError("Erro ao atualizar curso.");
       }
     },
-    []
+    [getAuthHeader]
   );
 
   useEffect(() => {

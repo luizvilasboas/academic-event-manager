@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { FaBook } from "react-icons/fa";
 import Pagination from "../components/Pagination";
@@ -6,11 +6,7 @@ import usePagination from "../hooks/usePagination";
 import useCourses from "../hooks/useCourses";
 
 const Courses = () => {
-  const { courses, listCourses } = useCourses();
-
-  useEffect(() => {
-    listCourses();
-  }, [listCourses]);
+  const { courses } = useCourses();
 
   const coursesPerPage = 5;
 

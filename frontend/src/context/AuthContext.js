@@ -37,8 +37,6 @@ export const AuthProvider = ({ children }) => {
         password,
       });
 
-      console.log(response.data);
-
       if (response.status === 200) {
         const { token, id, name, email } = response.data;
 

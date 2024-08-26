@@ -61,7 +61,6 @@ const useEvent = () => {
     event,
     loading,
     error,
-    listEvents,
     getEvent,
   };
 };

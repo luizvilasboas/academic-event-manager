@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import { FaCalendarAlt, FaInfoCircle } from "react-icons/fa";
@@ -6,11 +6,7 @@ import useEvent from "../hooks/useEvent";
 import usePagination from "../hooks/usePagination";
 
 const Events = () => {
-  const { events, listEvents } = useEvent();
-
-  useEffect(() => {
-    listEvents();
-  }, [listEvents]);
+  const { events } = useEvent();
 
   const eventsPerPage = 3;
 

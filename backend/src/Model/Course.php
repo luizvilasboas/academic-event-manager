@@ -76,7 +76,7 @@ class Course
 
     public function getCoursesByUser(int $userId): array
     {
-        $sql = "SELECT *
+        $sql = "SELECT c.event_id AS id, c.title, c.description, c.start_time, c.end_time
                 FROM {$this->table} c
                 JOIN registrations r ON c.id = r.course_id
                 WHERE r.student_id = :user_id";

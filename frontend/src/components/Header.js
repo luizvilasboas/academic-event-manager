@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FaBook,
   FaCalendarAlt,
@@ -7,10 +7,15 @@ import {
   FaUserCircle,
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
+import useUser from "../hooks/useUser";
+import { useMessage } from "../context/MessageContext";
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { user, loading, logout } = useAuth();
+  const { logout } = useAuth();
+  const { user } = useUser();
+  const { setMessage } = useMessage();
+  const naviagate = useNavigate();
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -19,6 +24,12 @@ const Header = () => {
   const closeDropdown = () => {
     setDropdownOpen(false);
   };
+
+  const handleLogout = () => {
+    logout()
+    naviagate("/login");
+    setMessage("success", "Logout feito com sucesso!");
+  }
 
   return (
     <header className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-6 shadow-lg">
@@ -60,7 +71,7 @@ const Header = () => {
             >
               <FaUserCircle className="w-10 h-10" />
               <span className="hidden sm:block text-lg">
-                {loading ? "Carregando..." : user?.name || "Usuário não logado"}
+                {user?.name || "Usuário não logado"}
               </span>
             </div>
 
@@ -76,7 +87,7 @@ const Header = () => {
                 <div
                   to="/logout"
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => logout()}
+                  onClick={() => handleLogout()}
                 >
                   Logout
                 </div>

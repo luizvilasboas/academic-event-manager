@@ -15,7 +15,7 @@ const CourseDetail = () => {
     if (id) {
       getCourse(id);
     }
-  }, [getCourse, id]);
+  }, [id, getCourse]);
 
   if (!course) {
     return <p>Carregando...</p>;
@@ -55,7 +55,7 @@ const CourseDetail = () => {
 
       <div className="mt-12">
         <Link
-          to={`/courses/${id}/enter`}
+          to={`/course/${id}/register`}
           className="px-8 py-4 text-xl font-semibold bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full shadow-lg hover:scale-110 transform transition-transform duration-300"
         >
           Entrar no Curso

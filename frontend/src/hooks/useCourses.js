@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const useCourses = () => {
@@ -6,20 +6,19 @@ const useCourses = () => {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [fetchedCourses, setFetchedCourses] = useState(false);
-  const [fetchedCourseById, setFetchedCourseById] = useState({});
+  const [fetched, setFetched] = useState(false);
 
   const getAuthToken = () => {
     return localStorage.getItem('token');
   };
 
-  const getAuthHeader = () => {
+  const getAuthHeader = useCallback(() => {
     const token = getAuthToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
-  };
+  }, []);
 
-  const listCourses = async () => {
-    if (fetchedCourses) return;
+  const listCourses = useCallback(async () => {
+    if (fetched) return;
 
     setLoading(true);
     try {
@@ -27,39 +26,41 @@ const useCourses = () => {
         headers: getAuthHeader(),
       });
       setCourses(response.data);
-      setFetchedCourses(true);
       setError(null);
+      setFetched(true);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetched, getAuthHeader]);
 
-  const getCourse = async (id) => {
-    if (fetchedCourseById[id]) return;
-
+  const getCourse = useCallback(async (id) => {
     setLoading(true);
     try {
       const response = await axios.get(`http://localhost:8000/course/${id}`, {
         headers: getAuthHeader(),
       });
       setCourse(response.data);
-      setFetchedCourseById((prev) => ({ ...prev, [id]: true }));
       setError(null);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [getAuthHeader]);
+
+  useEffect(() => {
+    if (!fetched) {
+      listCourses();
+    }
+  }, [fetched, listCourses]);
 
   return {
     courses,
     course,
     loading,
     error,
-    listCourses,
     getCourse,
   };
 };

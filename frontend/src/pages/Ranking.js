@@ -18,21 +18,13 @@ const getMedalColor = (rank) => {
 };
 
 const Ranking = () => {
-  const { scores, loading, error } = useScores();
+  const { scores } = useScores();
   const {
     currentPage,
     currentItems: currentRankings,
     totalPages,
     paginate,
   } = usePagination(scores, 5);
-
-  if (loading) {
-    return <p className="text-center text-blue-600">Carregando...</p>;
-  }
-
-  if (error) {
-    return <p className="text-center text-red-600">{error}</p>;
-  }
 
   return (
     <div className="container mx-auto p-6">

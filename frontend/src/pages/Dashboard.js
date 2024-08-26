@@ -1,21 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FaBookOpen, FaInfoCircle } from "react-icons/fa";
 import useUser from "../hooks/useUser";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
-  const { courses, events, loading, error } = useUser();
-
-  useEffect(() => {
-  }, [courses, events]);
-
-  if (loading) {
-    return <p>Carregando...</p>;
-  }
-
-  if (error) {
-    return <p>Erro ao carregar os dados: {error}</p>;
-  }
+  const { courses, events } = useUser();
 
   return (
     <div>
@@ -32,7 +21,9 @@ const Dashboard = () => {
                 className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 p-6 rounded-lg shadow-xl flex items-center hover:scale-105 transition-transform duration-300"
               >
                 <FaBookOpen className="text-white text-4xl mr-6" />
-                <h4 className="text-white text-2xl font-bold">{course.title}</h4>
+                <h4 className="text-white text-2xl font-bold">
+                  {course.title}
+                </h4>
               </Link>
             ))}
           </div>
@@ -50,7 +41,9 @@ const Dashboard = () => {
                 className="bg-gradient-to-r from-blue-400 via-teal-500 to-green-500 p-6 rounded-lg shadow-xl flex items-center hover:scale-105 transition-transform duration-300"
               >
                 <FaInfoCircle className="text-white text-4xl mr-6" />
-                <h4 className="text-white text-2xl font-semibold">{event.name}</h4>
+                <h4 className="text-white text-2xl font-semibold">
+                  {event.name}
+                </h4>
               </Link>
             ))}
           </div>

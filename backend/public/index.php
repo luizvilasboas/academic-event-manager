@@ -10,20 +10,29 @@ use Olooeez\AcademicEventManager\Controller\ScoresController;
 use Olooeez\AcademicEventManager\Controller\UserController;
 use Olooeez\AcademicEventManager\Helper\Auth;
 
-if (isset($_SERVER['HTTP_ORIGIN'])) {
-    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-    header('Access-Control-Allow-Credentials: true');
-    header('Access-Control-Max-Age: 86400');
+setupCors();
+handleOptionsRequest();
+
+function setupCors()
+{
+    if (isset($_SERVER['HTTP_ORIGIN'])) {
+        header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+        header('Access-Control-Allow-Credentials: true');
+        header('Access-Control-Max-Age: 86400');
+    }
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']))
-        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PATCH, DELETE");
-
-    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']))
-        header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
-
-    exit;
+function handleOptionsRequest()
+{
+    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
+            header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PATCH, DELETE");
+        }
+        if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+            header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
+        }
+        exit();
+    }
 }
 
 function sendJsonResponse($code, $message)
@@ -34,8 +43,7 @@ function sendJsonResponse($code, $message)
 }
 
 $method = $_SERVER["REQUEST_METHOD"];
-$request = trim($_SERVER["REQUEST_URI"], "/");
-$segments = explode("/", $request);
+$segments = explode("/", trim($_SERVER["REQUEST_URI"], "/"));
 
 $headers = getallheaders();
 $token = isset($headers["Authorization"]) ? str_replace("Bearer ", "", $headers["Authorization"]) : null;
@@ -44,211 +52,150 @@ $database = new Database();
 $connection = $database->getConnection();
 
 $auth = new Auth();
+if ($segments[0] !== 'auth' && !$auth->validateJWT($token)) {
+    sendJsonResponse(401, ["message" => "Not authorized"]);
+}
 
 switch ($segments[0]) {
     case "auth":
-        $controller = new AuthController($connection);
-        switch ($segments[1]) {
-            case "login":
-                $method === "POST" ? $controller->login() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                break;
-            case "register":
-                $method === "POST" ? $controller->register() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                break;
-            default:
-                sendJsonResponse(404, ["message" => "Action not found"]);
-        }
+        handleAuth($segments, $method, $connection);
         break;
     case "event":
-        if ($token == null) {
-            sendJsonResponse(401, ["message" => "Not authorized"]);
-        }
-        if ($auth->validateJWT($token)) {
-            $controller = new EventController($connection);
-
-            if (is_numeric($segments[1])) {
-                $method === "GET" ? $controller->getEventById((int) $segments[1]) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                break;
-            }
-
-            switch ($segments[1]) {
-                case "create":
-                    $method === "POST" ? $controller->create() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                case "update":
-                    if (isset($segments[2])) {
-                        $id = $segments[2];
-                    } else {
-                        sendJsonResponse(405, ["message" => "Course ID not found"]);
-                    }
-                    $method === "PATCH" ? $controller->update($id) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                case "list":
-                    $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                case "delete":
-                    if (isset($segments[2])) {
-                        $id = $segments[2];
-                    } else {
-                        sendJsonResponse(405, ["message" => "Course ID not found"]);
-                    }
-                    $method === "DELETE" ? $controller->delete($id) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                default:
-                    sendJsonResponse(404, ["message" => "Action not found"]);
-            }
-        } else {
-            sendJsonResponse(401, ["message" => "Not authorized"]);
-        }
+        handleEvent($segments, $method, $connection);
         break;
     case "course":
-        if ($token == null) {
-            sendJsonResponse(401, ["message" => "Not authorized"]);
-        }
-
-        $jwt_values = $auth->validateJWT($token);
-
-        if ($jwt_values) {
-            $userId = $jwt_values["sub"];
-
-            $controller = new CourseController($connection);
-
-            if (is_numeric($segments[1])) {
-                $courseId = (int) $segments[1];
-
-                if (!isset($segments[2])) {
-                    $method === "GET" ? $controller->getCourseById($courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                }
-
-                if ($token == null) {
-                    sendJsonResponse(401, ["message" => "Not authorized"]);
-                }
-
-                switch ($segments[2]) {
-                    case "enroll":
-                        $method === "POST" ? $controller->enroll($userId, $courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                        break;
-                    case "unroll":
-                        $method === "DELETE" ? $controller->enroll($userId, $courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                        break;
-                    default:
-                        sendJsonResponse(404, ["message" => "Action not found"]);
-                }
-            }
-
-            switch ($segments[1]) {
-                case "create":
-                    $method === "POST" ? $controller->create() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                case "update":
-                    if (isset($segments[2])) {
-                        $id = $segments[2];
-                    } else {
-                        sendJsonResponse(405, ["message" => "Course ID not found"]);
-                    }
-                    $method === "PATCH" ? $controller->update($id) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                case "list":
-                    $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                case "delete":
-                    if (isset($segments[2])) {
-                        $id = $segments[2];
-                    } else {
-                        sendJsonResponse(405, ["message" => "Course ID not found"]);
-                    }
-                    $method === "DELETE" ? $controller->delete($id) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                default:
-                    sendJsonResponse(404, ["message" => "Action not found"]);
-            }
-        } else {
-            sendJsonResponse(401, ["message" => "Not authorized"]);
-        }
+        handleCourse($segments, $method, $connection);
         break;
     case "user":
-        if ($token == null) {
-            sendJsonResponse(401, ["message" => "Not authorized"]);
-        }
-
-        $jwt_values = $auth->validateJWT($token);
-
-        if ($jwt_values) {
-            $userId = $jwt_values["sub"];
-
-            if (is_numeric($segments[1])) {
-                $controller = new UserController($connection);
-
-                $userId = (int) $segments[1];
-
-                switch ($method) {
-                    case "PATCH":
-                        $controller->updateUser($userId);
-                        break;
-                    case "DELETE":
-                        $controller->deleteUser($userId);
-                        break;
-                    default:
-                        sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                }
-
-                break;
-            }
-
-            switch ($segments[1]) {
-                case "list":
-                    $controller = new UserController($connection);
-
-                    $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                case "me":
-                    $controller = new UserController($connection);
-
-                    if (isset($segments[2]) && $segments[2] == "edit") {
-                        $method === "PATCH" ? $controller->updateUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                        break;
-                    } else if (isset($segments[2])) {
-                        sendJsonResponse(404, ["message" => "Action not found"]);
-                        break;
-                    }
-
-                    $method === "GET" ? $controller->getUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                case "courses":
-                    $controller = new CourseController($connection);
-                    $method === "GET" ? $controller->getCoursesFromStudent($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                case "events":
-                    $controller = new EventController($connection);
-                    $method === "GET" ? $controller->getEventFromStudent($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
-                    break;
-                default:
-                    sendJsonResponse(404, ["message" => "Action not found"]);
-            }
-        } else {
-            sendJsonResponse(401, ["message" => "Not authorized"]);
-        }
-
+        handleUser($segments, $method, $connection);
         break;
     case "scores":
-        if ($token == null) {
-            sendJsonResponse(401, ["message" => "Not authorized"]);
-        }
-
-        $controller = new ScoresController($connection);
-
-        $method === "GET" ? $controller->getScores() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+        handleScores($method, $connection);
         break;
     case "registration":
-        if ($token == null) {
-            sendJsonResponse(401, ["message" => "Not authorized"]);
-        }
-
-        $controller = new UserController($connection);
-
-        $method === "GET" ? $controller->listUsersWithCourses() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+        handleRegistration($method, $connection);
         break;
     default:
         sendJsonResponse(404, ["message" => "Controller not found"]);
+}
+
+function handleAuth($segments, $method, $connection)
+{
+    $controller = new AuthController($connection);
+    switch ($segments[1]) {
+        case "login":
+            $method === "POST" ? $controller->login() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+            break;
+        case "register":
+            $method === "POST" ? $controller->register() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+            break;
+        default:
+            sendJsonResponse(404, ["message" => "Action not found"]);
+    }
+}
+
+function handleEvent($segments, $method, $connection)
+{
+    global $auth, $token;
+    $jwt_values = $auth->validateJWT($token);
+
+    $controller = new EventController($connection);
+    $id = $segments[2] ?? null;
+
+    if ($segments[1] === "list") {
+        $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+        return;
+    }
+
+    if (!$jwt_values["is_admin"]) {
+        sendJsonResponse(403, ["message" => "Access denied. Admins only."]);
+    }
+
+    if (is_numeric($segments[1])) {
+        $method === "GET" ? $controller->getEventById((int) $segments[1]) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+    } else {
+        match ($segments[1]) {
+            "create" => $method === "POST" ? $controller->create() : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "update" => $method === "PATCH" && $id ? $controller->update($id) : sendJsonResponse(405, ["message" => "Course ID not found"]),
+            "delete" => $method === "DELETE" && $id ? $controller->delete($id) : sendJsonResponse(405, ["message" => "Course ID not found"]),
+            default => sendJsonResponse(404, ["message" => "Action not found"])
+        };
+    }
+}
+
+function handleCourse($segments, $method, $connection)
+{
+    global $auth, $token;
+    $jwt_values = $auth->validateJWT($token);
+    $userId = getUserId();
+    $courseId = isset($segments[1]) && is_numeric($segments[1]) ? (int) $segments[1] : null;
+    $id = $segments[2] ?? null;
+
+    $controller = new CourseController($connection);
+
+    if ($segments[1] === "list") {
+        $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+        return;
+    }
+
+    if (($segments[1] === "create" || $segments[1] === "update" || $segments[1] === "delete") && !$jwt_values["is_admin"]) {
+        sendJsonResponse(403, ["message" => "Access denied. Admins only."]);
+    }
+
+    if ($courseId && !$id) {
+        $method === "GET" ? $controller->getCourseById($courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+    } else {
+        match ($segments[2] ?? null) {
+            "enroll" => $method === "POST" ? $controller->enroll($userId, $courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "unroll" => $method === "DELETE" ? $controller->unroll($userId, $courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            default => match ($segments[1]) {
+                    "create" => $method === "POST" ? $controller->create() : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+                    "update" => $method === "PATCH" && $id ? $controller->update($id) : sendJsonResponse(405, ["message" => "Course ID not found"]),
+                    "delete" => $method === "DELETE" && $id ? $controller->delete($id) : sendJsonResponse(405, ["message" => "Course ID not found"]),
+                    default => sendJsonResponse(404, ["message" => "Action not found"])
+                }
+        };
+    }
+}
+
+function handleUser($segments, $method, $connection)
+{
+    $controller = new UserController($connection);
+    $userId = getUserId();
+    $id = $segments[2] ?? null;
+
+    if (is_numeric($segments[1])) {
+        match ($method) {
+            "PATCH" => $controller->updateUser((int) $segments[1]),
+            "DELETE" => $controller->deleteUser((int) $segments[1]),
+            default => sendJsonResponse(405, ["message" => "Method Not Allowed"])
+        };
+    } else {
+        match ($segments[1]) {
+            "list" => $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "me" => $method === "GET" ? $controller->getUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "courses" => $method === "GET" ? $controller->getCoursesFromStudent($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "events" => $method === "GET" ? $controller->getEventFromStudent($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            default => sendJsonResponse(404, ["message" => "Action not found"])
+        };
+    }
+}
+
+function handleScores($method, $connection)
+{
+    $controller = new ScoresController($connection);
+    $method === "GET" ? $controller->getScores() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+}
+
+function handleRegistration($method, $connection)
+{
+    $controller = new UserController($connection);
+    $method === "GET" ? $controller->listUsersWithCourses() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+}
+
+function getUserId()
+{
+    global $auth, $token;
+    $jwt_values = $auth->validateJWT($token);
+    return $jwt_values["sub"] ?? null;
 }

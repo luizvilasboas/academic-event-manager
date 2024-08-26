@@ -7,6 +7,7 @@ const useUser = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [fetched, setFetched] = useState(false);
 
   const getAuthToken = () => {
     return localStorage.getItem("token");
@@ -18,10 +19,10 @@ const useUser = () => {
   }, []);
 
   const fetchUserInfo = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+    if (fetched) return;
 
+    setLoading(true);
+    try {
       const config = {
         headers: getAuthHeader(),
       };
@@ -42,14 +43,16 @@ const useUser = () => {
         config
       );
 
+      setError(null);
       setCourses(coursesData);
       setEvents(eventsData);
+      setFetched(true);
     } catch (err) {
       setError("Erro ao carregar as informações do usuário.");
     } finally {
       setLoading(false);
     }
-  }, [getAuthHeader]);
+  }, [fetched, getAuthHeader]);
 
   const updateUser = async (updatedData) => {
     try {
@@ -82,8 +85,10 @@ const useUser = () => {
   };
 
   useEffect(() => {
-    fetchUserInfo();
-  }, [fetchUserInfo]);
+    if (!fetched) {
+      fetchUserInfo();
+    }
+  }, [fetched, fetchUserInfo]);
 
   return {
     user,

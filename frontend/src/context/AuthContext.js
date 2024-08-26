@@ -1,35 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext } from "react";
 import axios from "axios";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      setLoading(true);
-      axios
-        .get("http://localhost:8000/user/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          const { id, name, email } = response.data
-          setUser({id, name, email});
-        })
-        .catch(() => {
-          localStorage.removeItem("token");
-          setUser(null);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
   const login = async (email, password) => {
     try {
       const response = await axios.post("http://localhost:8000/auth/login", {
@@ -38,10 +12,10 @@ export const AuthProvider = ({ children }) => {
       });
 
       if (response.status === 200) {
-        const { token, id, name, email } = response.data;
+        const { token, is_admin } = response.data;
 
         localStorage.setItem("token", token);
-        setUser({id, name, email});
+        localStorage.setItem("is_admin", is_admin);
 
         return { status: true, text: "Login feito com sucesso." };
       }
@@ -57,7 +31,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("token");
-    setUser(null);
+    localStorage.removeItem("is_admin");
   };
 
   const register = async (name, email, password) => {
@@ -82,7 +56,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, loading }}>
+    <AuthContext.Provider value={{ login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );

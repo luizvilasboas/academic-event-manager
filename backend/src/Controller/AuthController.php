@@ -28,8 +28,8 @@ class AuthController
 
             if ($user_row) {
                 $auth = new Auth();
-                $jwt = $auth->generateJWT($user_row["id"], $user_row["email"]);
-                echo json_encode(["token" => $jwt, "id" => $user_row["id"], "name" => $user_row["name"], "email" => $user_row["email"]]);
+                $jwt = $auth->generateJWT($user_row["id"], $user_row["is_admin"]);
+                echo json_encode(["token" => $jwt, "is_admin" => $user_row["is_admin"]]);
             } else {
                 http_response_code(401);
                 echo json_encode(["message" => "Invalid credentials"]);

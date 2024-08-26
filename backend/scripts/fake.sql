@@ -4,7 +4,8 @@ INSERT INTO users (name, email, password, is_admin) VALUES
 ('Maria de Souza', 'maria.souza@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE),
 ('Pedro Almeida', 'pedro.almeida@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE),
 ('Ana Costa', 'ana.costa@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE),
-('Lucas Pereira', 'lucas.pereira@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE);
+('Lucas Pereira', 'lucas.pereira@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', FALSE),
+('Luiz Felipe', 'luiz.felipe@example.com', '$2y$10$4B19Hq.xZESOCL17bAu3fe69I1yq0BVSUKlXPmKt4Qtd.Kc0WmgxK', TRUE);
 
 -- Adicionar eventos
 INSERT INTO events (name, description, start_time, end_time) VALUES 

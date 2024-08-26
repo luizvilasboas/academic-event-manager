@@ -18,7 +18,7 @@ class Auth
         $this->algorithm = $algorithm;
     }
 
-    public function generateJWT(int $id, string $email): string
+    public function generateJWT(int $id, string $is_admin): string
     {
         $payload = [
             "iss" => "yourdomain.com",
@@ -26,7 +26,7 @@ class Auth
             "iat" => time(),
             "exp" => time() + (60 ** 7),
             "sub" => $id,
-            "email" => $email
+            "is_admin" => $is_admin
         ];
 
         return JWT::encode($payload, $this->secretKey, $this->algorithm);

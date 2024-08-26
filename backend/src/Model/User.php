@@ -18,7 +18,7 @@ class User
 
     public function checkCredentials(): array|bool
     {
-        $query = "SELECT id, name, email, password FROM {$this->table} WHERE email = :email LIMIT 0,1";
+        $query = "SELECT id, name, email, password, is_admin FROM {$this->table} WHERE email = :email LIMIT 0,1";
         $stmt = $this->connection->prepare($query);
         $stmt->bindParam(":email", $this->email);
         $stmt->execute();
@@ -133,5 +133,33 @@ class User
         }
 
         return array_values($usersWithCourses);
+    }
+
+    public function getCoursesByUser(int $userId): array
+    {
+        $sql = "SELECT c.event_id AS id, c.title, c.description, c.start_time, c.end_time
+                FROM courses c
+                JOIN registrations r ON c.id = r.course_id
+                WHERE r.student_id = :user_id";
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindParam(":user_id", $userId, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getEventsByUser($userId): array
+    {
+        $sql = "SELECT e.id, e.name, e.description
+                FROM events e
+                JOIN courses c ON e.id = c.event_id
+                JOIN registrations r ON c.id = r.course_id
+                WHERE r.student_id = :user_id";
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindParam(":user_id", $userId, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

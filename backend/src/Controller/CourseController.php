@@ -131,16 +131,6 @@ class CourseController
         }
     }
 
-    public function getCoursesFromStudent(int $userId)
-    {
-        header("Content-Type: application/json");
-
-        $courses = $this->course->getCoursesByUser($userId);
-
-        http_response_code(200);
-        echo json_encode($courses);
-    }
-
     public function getCourseById(int $id)
     {
         header("Content-Type: application/json");

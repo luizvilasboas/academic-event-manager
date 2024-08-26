@@ -96,4 +96,35 @@ class UserController
             echo json_encode(["message" => "No users found."]);
         }
     }
+
+    public function getCoursesFromStudent(int $id)
+    {
+        header("Content-Type: application/json");
+
+        $courses = $this->user->getCoursesByUser($id);
+
+        http_response_code(200);
+        echo json_encode($courses);
+    }
+
+    public function getEventFromStudent(int $id)
+    {
+        header("Content-Type: application/json");
+
+        if (!$id) {
+            http_response_code(400);
+            echo json_encode(["message" => "Student ID is required"]);
+            return;
+        }
+
+        try {
+            $events = $this->user->getEventsByUser($id);
+
+            http_response_code(200);
+            echo json_encode($events);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(["message" => "An error occurred while retrieving events", "error" => $e->getMessage()]);
+        }
+    }
 }

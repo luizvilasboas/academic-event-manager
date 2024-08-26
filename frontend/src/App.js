@@ -22,6 +22,11 @@ const PrivateRoute = () => {
   return token ? <Outlet /> : <Navigate to="/login" />;
 };
 
+const AdminRoute = () => {
+  const isAdmin = JSON.parse(localStorage.getItem("is_admin"));
+  return isAdmin ? <Outlet /> : <Navigate to="/dashboard" />;
+};
+
 const App = () => {
   return (
     <Router>
@@ -48,7 +53,9 @@ const App = () => {
             <Route exact path="/profile" element={<UserProfile />} />
             <Route exact path="/courses/:id" element={<CourseDetail />} />
             <Route exact path="/events/:id" element={<EventDetail />} />
-            <Route exact path="/admin" element={<AdminPanel />} />
+            <Route element={<AdminRoute />}>
+              <Route exact path="/admin" element={<AdminPanel />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

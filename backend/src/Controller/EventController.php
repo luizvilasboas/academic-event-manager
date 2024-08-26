@@ -102,27 +102,6 @@ class EventController
         }
     }
 
-    public function getEventFromStudent(int $studentId)
-    {
-        header("Content-Type: application/json");
-
-        if (!$studentId) {
-            http_response_code(400);
-            echo json_encode(["message" => "Student ID is required"]);
-            return;
-        }
-
-        try {
-            $events = $this->event->getEventsByUser($studentId);
-
-            http_response_code(200);
-            echo json_encode($events);
-        } catch (\Exception $e) {
-            http_response_code(500);
-            echo json_encode(["message" => "An error occurred while retrieving events", "error" => $e->getMessage()]);
-        }
-    }
-
     public function getEventById(int $id)
     {
         header("Content-Type: application/json");

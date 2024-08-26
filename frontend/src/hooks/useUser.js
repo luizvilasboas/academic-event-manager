@@ -15,7 +15,7 @@ const useUser = () => {
   const getAuthHeader = useCallback(() => {
     const token = getAuthToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
-  }, []); // Agora getAuthHeader é estável e não será recriada.
+  }, []);
 
   const fetchUserInfo = useCallback(async () => {
     try {
@@ -49,7 +49,7 @@ const useUser = () => {
     } finally {
       setLoading(false);
     }
-  }, [getAuthHeader]); // Agora getAuthHeader é incluída nas dependências de useCallback.
+  }, [getAuthHeader]);
 
   const updateUser = async (updatedData) => {
     try {
@@ -60,8 +60,8 @@ const useUser = () => {
         headers: getAuthHeader(),
       };
 
-      const response = await axios.put(
-        "http://localhost:8000/user/me",
+      const response = await axios.patch(
+        "http://localhost:8000/user/me/edit",
         updatedData,
         config
       );

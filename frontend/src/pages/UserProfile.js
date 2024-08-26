@@ -1,51 +1,103 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { FaBook, FaCalendarAlt, FaEdit } from "react-icons/fa";
-import useUser from "../hooks/useUser";
+import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { useMessage } from "../context/MessageContext";
 import Modal from "../components/Modal";
+import Alert from "../components/Alert";
+import useUser from "../hooks/useUser";
 
 const UserProfile = () => {
-  const { courses, events, updateUser } = useUser();
   const { user, loading } = useAuth();
+  const { message, setMessage } = useMessage();
+  const [courses, setCourses] = useState([]);
+  const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
     password: "",
   });
+  const [fetching, setFetching] = useState(true);
+  const [error, setError] = useState(null);
+  const { updateUser } = useUser();
 
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name,
-        email: user.email,
-        password: "",
-      });
-    }
-  }, [user]);
+  const getAuthToken = () => {
+    return localStorage.getItem("token");
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  const getAuthHeader = useCallback(() => {
+    const token = getAuthToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }, []);
+
+  const fetchUserInfo = useCallback(async () => {
+    try {
+      setFetching(true);
+      setError(null);
+
+      const config = {
+        headers: getAuthHeader(),
+      };
+
+      const { data: userData } = await axios.get(
+        "http://localhost:8000/user/me",
+        config
+      );
+
+      setFormData({
+        name: userData.name,
+        email: userData.email,
+        password: "",
+      });
+
+      const { data: coursesData } = await axios.get(
+        "http://localhost:8000/user/courses",
+        config
+      );
+      const { data: eventsData } = await axios.get(
+        "http://localhost:8000/user/events",
+        config
+      );
+
+      setCourses(coursesData);
+      setEvents(eventsData);
+    } catch (err) {
+      setError("Erro ao carregar as informações do usuário.");
+    } finally {
+      setFetching(false);
+    }
+  }, [getAuthHeader]);
+
   const handleSaveChanges = async () => {
     const result = await updateUser(formData);
     if (result.status) {
-      alert("Perfil atualizado com sucesso.");
+      setMessage("success", "Perfil atualizado com sucesso!");
     } else {
-      alert("Erro ao atualizar o perfil.");
+      setMessage("error", result.text || "Erro ao atualizar o perfil.");
     }
     setIsModalOpen(false);
   };
 
-  if (loading) {
+  useEffect(() => {
+    fetchUserInfo();
+  }, [fetchUserInfo]);
+
+  if (loading || fetching) {
     return <p>Carregando...</p>;
   }
 
   return (
-    <div className="max-w-6xl mx-auto mt-16 p-10">
+    <div className="max-w-6xl mt-10">
+      <div className="mb-10">
+        {message.text && <Alert type={message.type} text={message.text} />}
+      </div>
       <div className="flex justify-between items-center mb-12">
         <h2 className="text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
           Perfil do Usuário
@@ -60,10 +112,10 @@ const UserProfile = () => {
 
       <div className="text-4xl font-bold mb-12 flex gap-5">
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
-          {user?.name || "Usuário não encontrado"}
+          {formData.name || "Usuário não encontrado"}
         </span>
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-teal-500">
-          {user?.email || "Email não encontrado"}
+          {formData.email || "Email não encontrado"}
         </span>
       </div>
 
@@ -71,9 +123,9 @@ const UserProfile = () => {
         <h3 className="text-3xl font-semibold mb-6">Meus Cursos</h3>
         {courses.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {courses.map((course) => (
+            {courses.map((course, index) => (
               <Link
-                key={course.id}
+                key={index}
                 to={`/courses/${course.id}`}
                 className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-white rounded-lg shadow-lg p-6 transform hover:scale-105 transition-transform duration-300"
               >
@@ -86,7 +138,9 @@ const UserProfile = () => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-700">Você não está cadastrado em nenhum curso.</p>
+          <p className="text-gray-700">
+            Você não está cadastrado em nenhum curso.
+          </p>
         )}
       </div>
 
@@ -94,9 +148,9 @@ const UserProfile = () => {
         <h3 className="text-3xl font-semibold mb-6">Meus Eventos</h3>
         {events.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event) => (
+            {events.map((event, index) => (
               <Link
-                key={event.id}
+                key={index}
                 to={`/events/${event.id}`}
                 className="bg-gradient-to-r from-blue-400 via-green-500 to-teal-500 text-white rounded-lg shadow-lg p-6 transform hover:scale-105 transition-transform duration-300"
               >
@@ -109,7 +163,9 @@ const UserProfile = () => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-700">Você não está cadastrado em nenhum evento.</p>
+          <p className="text-gray-700">
+            Você não está cadastrado em nenhum evento.
+          </p>
         )}
       </div>
 

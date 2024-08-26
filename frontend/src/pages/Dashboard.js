@@ -25,9 +25,9 @@ const Dashboard = () => {
             Todos os meus cursos
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {courses.map((course) => (
+            {courses.map((course, index) => (
               <Link
-                key={course.id}
+                key={index}
                 to={`/courses/${course.id}`}
                 className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 p-6 rounded-lg shadow-xl flex items-center hover:scale-105 transition-transform duration-300"
               >
@@ -43,9 +43,9 @@ const Dashboard = () => {
             Todos os meus eventos
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event) => (
+            {events.map((event, index) => (
               <Link
-                key={event.id}
+                key={index}
                 to={`/events/${event.id}`}
                 className="bg-gradient-to-r from-blue-400 via-teal-500 to-green-500 p-6 rounded-lg shadow-xl flex items-center hover:scale-105 transition-transform duration-300"
               >

@@ -33,7 +33,7 @@ const useScores = () => {
     };
 
     fetchScores();
-  }, [getAuthHeader]); // Agora, getAuthHeader é incluída nas dependências de useEffect.
+  }, [getAuthHeader]);
 
   return { scores, loading, error };
 };

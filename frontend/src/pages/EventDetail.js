@@ -62,9 +62,9 @@ const EventDetail = () => {
         <div className="mt-12">
           <h3 className="text-3xl font-semibold mb-6">Cursos Associados</h3>
           <div className="flex gap-8">
-            {event.courses.map((course) => (
+            {event.courses.map((course, index) => (
               <div
-                key={course.id}
+                key={index}
                 className="bg-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300"
               >
                 <div className="flex items-center mb-4">

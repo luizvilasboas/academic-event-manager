@@ -181,7 +181,7 @@ switch ($segments[0]) {
                 case "me":
                     $controller = new UserController($connection);
         
-                    if ($segments[2] == "edit") {
+                    if (isset($segments[2]) && $segments[2] == "edit") {
                         $method === "PATCH" ? $controller->updateUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
                         break;
                     } else if (isset($segments[2])) {

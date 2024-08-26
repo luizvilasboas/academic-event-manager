@@ -37,7 +37,7 @@ const useCourses = () => {
   };
 
   const getCourse = async (id) => {
-    if (fetchedCourseById[id]) return; // Se o curso já foi buscado, evita nova chamada.
+    if (fetchedCourseById[id]) return;
 
     setLoading(true);
     try {
@@ -45,7 +45,7 @@ const useCourses = () => {
         headers: getAuthHeader(),
       });
       setCourse(response.data);
-      setFetchedCourseById((prev) => ({ ...prev, [id]: true })); // Marca o curso como já buscado.
+      setFetchedCourseById((prev) => ({ ...prev, [id]: true }));
       setError(null);
     } catch (err) {
       setError(err.message);

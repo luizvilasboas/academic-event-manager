@@ -12,10 +12,10 @@ const useEvent = () => {
     return localStorage.getItem("token");
   };
 
-  const getAuthHeader = () => {
+  const getAuthHeader = useCallback(() => {
     const token = getAuthToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
-  };
+  }, []);
 
   const listEvents = useCallback(async () => {
     if (fetched) return;
@@ -33,7 +33,7 @@ const useEvent = () => {
     } finally {
       setLoading(false);
     }
-  }, [fetched]);
+  }, [fetched, getAuthHeader]);
 
   const getEvent = useCallback(async (id) => {
     setLoading(true);
@@ -48,10 +48,9 @@ const useEvent = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [getAuthHeader]);
 
   useEffect(() => {
-    // Lista os eventos na primeira renderização
     if (!fetched) {
       listEvents();
     }

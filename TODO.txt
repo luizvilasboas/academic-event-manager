@@ -1,0 +1,2 @@
+(C) Make the backend code more clean
+(D) Make the routes better (use a desing pattern)

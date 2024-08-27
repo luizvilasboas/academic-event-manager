@@ -78,6 +78,49 @@ const useUser = () => {
     }
   };
 
+  const registerCourse = useCallback(
+    async (courseId) => {
+      setLoading(true);
+      try {
+        await axios.post(
+          `http://localhost:8000/course/${courseId}/register`,
+          {},
+          {
+            headers: getAuthHeader(),
+          }
+        );
+        setError(null);
+        setRefresh((prev) => !prev);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [getAuthHeader]
+  );
+
+  const unregisterCourse = useCallback(
+    async (courseId) => {
+      setLoading(true);
+      try {
+        await axios.delete(
+          `http://localhost:8000/course/${courseId}/unregister`,
+          {
+            headers: getAuthHeader(),
+          }
+        );
+        setError(null);
+        setRefresh((prev) => !prev);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [getAuthHeader]
+  );
+
   useEffect(() => {
     fetchUserInfo();
   }, [fetchUserInfo, refresh]);
@@ -89,6 +132,8 @@ const useUser = () => {
     loading,
     error,
     updateUser,
+    registerCourse,
+    unregisterCourse
   };
 };
 

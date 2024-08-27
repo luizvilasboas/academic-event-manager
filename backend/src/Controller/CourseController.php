@@ -96,38 +96,38 @@ class CourseController
         }
     }
 
-    public function enroll(int $studentId, int $courseId)
+    public function register(int $studentId, int $courseId)
     {
         header("Content-Type: application/json");
 
         $data = json_decode(file_get_contents("php://input"), true);
 
-        $this->registration->user_id = $studentId;
-        $this->registration->course_id = $$courseId;
+        $this->registration->student_id = $studentId;
+        $this->registration->course_id = $courseId;
 
-        if ($this->registration->enroll()) {
+        if ($this->registration->register()) {
             http_response_code(201);
-            echo json_encode(["message" => "Enrollment successful"]);
+            echo json_encode(["message" => "registerment successful"]);
         } else {
             http_response_code(500);
-            echo json_encode(["message" => "Failed to enroll"]);
+            echo json_encode(["message" => "Failed to register"]);
         }
 
     }
 
-    public function unroll(int $studentId, int $courseId)
+    public function unregister(int $studentId, int $courseId)
     {
         header("Content-Type: application/json");
 
-        $this->registration->user_id = $studentId;
+        $this->registration->student_id = $studentId;
         $this->registration->course_id = $courseId;
 
-        if ($this->registration->unroll()) {
+        if ($this->registration->unregister()) {
             http_response_code(200);
-            echo json_encode(["message" => "Unenrollment successful"]);
+            echo json_encode(["message" => "Unregisterment successful"]);
         } else {
             http_response_code(500);
-            echo json_encode(["message" => "Failed to unenroll"]);
+            echo json_encode(["message" => "Failed to unregister"]);
         }
     }
 

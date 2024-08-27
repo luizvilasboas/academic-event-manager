@@ -1,15 +1,37 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import useCourses from "../hooks/useCourses";
-import {
-  FaArrowLeft,
-  FaCalendarAlt,
-  FaClock,
-} from "react-icons/fa";
+import useUser from "../hooks/useUser";
+import { FaArrowLeft, FaCalendarAlt, FaClock } from "react-icons/fa";
 
 const CourseDetail = () => {
   const { id } = useParams();
   const { course, getCourse } = useCourses();
+  const { courses: userCourses, loading: userLoading, registerCourse, unregisterCourse } = useUser();
+  const [isRegistered, setIsRegistered] = useState(false);
+
+  const checkRegistrationStatus = useCallback(() => {
+    if (userCourses && id) {
+      const registered = userCourses.some((c) => c.id === parseInt(id, 10));
+      setIsRegistered(registered);
+    }
+  }, [userCourses, id]);
+
+  useEffect(() => {
+    if (id) {
+      getCourse(id);
+      checkRegistrationStatus();
+    }
+  }, [id, getCourse, checkRegistrationStatus]);
+
+  const handleRegister = async () => {
+    if (isRegistered) {
+      await unregisterCourse(id);
+    } else {
+      await registerCourse(id);
+    }
+    checkRegistrationStatus();
+  };
 
   useEffect(() => {
     if (id) {
@@ -17,7 +39,7 @@ const CourseDetail = () => {
     }
   }, [id, getCourse]);
 
-  if (!course) {
+  if (!course || userLoading) {
     return <p>Carregando...</p>;
   }
 
@@ -54,12 +76,16 @@ const CourseDetail = () => {
       </div>
 
       <div className="mt-12">
-        <Link
-          to={`/course/${id}/register`}
-          className="px-8 py-4 text-xl font-semibold bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full shadow-lg hover:scale-110 transform transition-transform duration-300"
+        <button
+          onClick={handleRegister}
+          className={`px-8 py-4 text-xl font-semibold ${
+            isRegistered
+              ? "bg-gradient-to-r from-red-400 to-red-600"
+              : "bg-gradient-to-r from-green-400 to-blue-500"
+          } text-white rounded-full shadow-lg hover:scale-110 transform transition-transform duration-300`}
         >
-          Entrar no Curso
-        </Link>
+          {isRegistered ? "Desregistrar" : "Registrar"}
+        </button>
       </div>
     </div>
   );

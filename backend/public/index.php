@@ -146,8 +146,8 @@ function handleCourse($segments, $method, $connection)
         $method === "GET" ? $controller->getCourseById($courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
     } else {
         match ($segments[2] ?? null) {
-            "enroll" => $method === "POST" ? $controller->enroll($userId, $courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
-            "unroll" => $method === "DELETE" ? $controller->unroll($userId, $courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "register" => $method === "POST" ? $controller->register($userId, $courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "unregister" => $method === "DELETE" ? $controller->unregister($userId, $courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
             default => match ($segments[1]) {
                     "create" => $method === "POST" ? $controller->create() : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
                     "update" => $method === "PATCH" && $id ? $controller->update($id) : sendJsonResponse(405, ["message" => "Course ID not found"]),

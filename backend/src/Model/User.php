@@ -137,7 +137,7 @@ class User
 
     public function getCoursesByUser(int $userId): array
     {
-        $sql = "SELECT c.event_id AS id, c.title, c.description, c.start_time, c.end_time
+        $sql = "SELECT c.id AS id, c.title, c.description, c.start_time, c.end_time
                 FROM courses c
                 JOIN registrations r ON c.id = r.course_id
                 WHERE r.student_id = :user_id";
@@ -150,7 +150,7 @@ class User
 
     public function getEventsByUser($userId): array
     {
-        $sql = "SELECT e.id, e.name, e.description
+        $sql = "SELECT DISTINCT e.id, e.name, e.description
                 FROM events e
                 JOIN courses c ON e.id = c.event_id
                 JOIN registrations r ON c.id = r.course_id

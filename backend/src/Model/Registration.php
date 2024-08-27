@@ -13,7 +13,7 @@ class Registration {
         $this->connection = $connection;
     }
 
-    public function enroll(): bool
+    public function register(): bool
     {
         $sql = "INSERT INTO " . $this->table . " (student_id, course_id) VALUES (:student_id, :course_id)";
         $stmt = $this->connection->prepare($sql);
@@ -24,7 +24,7 @@ class Registration {
         return $stmt->execute();
     }
 
-    public function unroll(): bool
+    public function unregister(): bool
     {
         $sql = "DELETE FROM " . $this->table . " WHERE student_id = :student_id AND course_id = :course_id";
         $stmt = $this->connection->prepare($sql);

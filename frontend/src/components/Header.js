@@ -14,13 +14,9 @@ import { useMessage } from "../context/MessageContext";
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { logout } = useAuth();
-  const { user, loading } = useUser();
+  const { user } = useUser();
   const { setMessage } = useMessage();
   const navigate = useNavigate();
-
-  if (loading) {
-    return <p>Carregando...</p>;
-  }
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -66,14 +62,14 @@ const Header = () => {
           >
             <FaTrophy className="mr-2 text-green-300" /> Ranking
           </Link>
-          {(user.is_admin && (
+          {user?.is_admin && (
             <Link
               to="/admin"
               className="text-white hover:text-blue-300 flex items-center"
             >
               <FaTools className="mr-2 text-blue-300" /> Administração
             </Link>
-          )) || ""}
+          )}
         </nav>
 
         <div className="flex items-center space-x-6">

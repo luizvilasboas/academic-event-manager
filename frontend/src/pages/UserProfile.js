@@ -8,9 +8,8 @@ import Alert from "../components/Alert";
 import useUser from "../hooks/useUser";
 
 const UserProfile = () => {
-  const { user: authUser, loading: authLoading } = useAuth();
   const { message, setMessage } = useMessage();
-  const { user, courses, events, updateUser, loading: userLoading } = useUser();
+  const { user, courses, events, updateUser } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     id: "",
@@ -20,15 +19,15 @@ const UserProfile = () => {
   });
 
   useEffect(() => {
-    if (authUser) {
+    if (user) {
       setFormData({
-        id: authUser.id,
-        name: authUser.name,
-        email: authUser.email,
+        id: user.id,
+        name: user.name,
+        email: user.email,
         password: "",
       });
     }
-  }, [authUser]);
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -48,7 +47,7 @@ const UserProfile = () => {
   const openEditModal = () => {
     if (user) {
       setFormData({
-        id: user.id, // Adicionando o id do usuário ao abrir o modal
+        id: user.id,
         name: user.name,
         email: user.email,
         password: "",
@@ -56,10 +55,6 @@ const UserProfile = () => {
     }
     setIsModalOpen(true);
   };
-
-  if (authLoading || userLoading) {
-    return <p>Carregando...</p>;
-  }
 
   return (
     <div className="max-w-6xl mt-10">

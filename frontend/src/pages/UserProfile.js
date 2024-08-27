@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaBook, FaCalendarAlt, FaEdit } from "react-icons/fa";
-import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useMessage } from "../context/MessageContext";
 import Modal from "../components/Modal";
@@ -9,71 +8,32 @@ import Alert from "../components/Alert";
 import useUser from "../hooks/useUser";
 
 const UserProfile = () => {
-  const { user, loading } = useAuth();
+  const { user: authUser, loading: authLoading } = useAuth();
   const { message, setMessage } = useMessage();
-  const [courses, setCourses] = useState([]);
-  const [events, setEvents] = useState([]);
+  const { user, courses, events, updateUser, loading: userLoading } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
+    id: "",
+    name: "",
+    email: "",
     password: "",
   });
-  const [fetching, setFetching] = useState(true);
-  const [error, setError] = useState(null);
-  const { updateUser } = useUser();
 
-  const getAuthToken = () => {
-    return localStorage.getItem("token");
-  };
+  useEffect(() => {
+    if (authUser) {
+      setFormData({
+        id: authUser.id,
+        name: authUser.name,
+        email: authUser.email,
+        password: "",
+      });
+    }
+  }, [authUser]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  const getAuthHeader = useCallback(() => {
-    const token = getAuthToken();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  }, []);
-
-  const fetchUserInfo = useCallback(async () => {
-    try {
-      setFetching(true);
-      setError(null);
-
-      const config = {
-        headers: getAuthHeader(),
-      };
-
-      const { data: userData } = await axios.get(
-        "http://localhost:8000/user/me",
-        config
-      );
-
-      setFormData({
-        name: userData.name,
-        email: userData.email,
-        password: "",
-      });
-
-      const { data: coursesData } = await axios.get(
-        "http://localhost:8000/user/courses",
-        config
-      );
-      const { data: eventsData } = await axios.get(
-        "http://localhost:8000/user/events",
-        config
-      );
-
-      setCourses(coursesData);
-      setEvents(eventsData);
-    } catch (err) {
-      setError("Erro ao carregar as informações do usuário.");
-    } finally {
-      setFetching(false);
-    }
-  }, [getAuthHeader]);
 
   const handleSaveChanges = async () => {
     const result = await updateUser(formData);
@@ -85,11 +45,19 @@ const UserProfile = () => {
     setIsModalOpen(false);
   };
 
-  useEffect(() => {
-    fetchUserInfo();
-  }, [fetchUserInfo]);
+  const openEditModal = () => {
+    if (user) {
+      setFormData({
+        id: user.id, // Adicionando o id do usuário ao abrir o modal
+        name: user.name,
+        email: user.email,
+        password: "",
+      });
+    }
+    setIsModalOpen(true);
+  };
 
-  if (loading || fetching) {
+  if (authLoading || userLoading) {
     return <p>Carregando...</p>;
   }
 
@@ -103,7 +71,7 @@ const UserProfile = () => {
           Perfil do Usuário
         </h2>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={openEditModal}
           className="text-blue-500 hover:underline text-lg flex items-center"
         >
           <FaEdit className="mr-2" /> Editar Perfil
@@ -112,10 +80,10 @@ const UserProfile = () => {
 
       <div className="text-4xl font-bold mb-12 flex gap-5">
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
-          {formData.name || "Usuário não encontrado"}
+          {user?.name || formData.name || "Usuário não encontrado"}
         </span>
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-teal-500">
-          {formData.email || "Email não encontrado"}
+          {user?.email || formData.email || "Email não encontrado"}
         </span>
       </div>
 

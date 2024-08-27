@@ -9,6 +9,8 @@ const useAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [refresh, setRefresh] = useState(false);
+
   const getAuthToken = useCallback(() => {
     return localStorage.getItem("token");
   }, []);
@@ -80,6 +82,7 @@ const useAdmin = () => {
         await axios.delete(`http://localhost:8000/user/${id}`, {
           headers: getAuthHeader(),
         });
+        setRefresh((prev) => !prev);
       } catch (err) {
         setError("Erro ao deletar usuário.");
       }
@@ -93,6 +96,7 @@ const useAdmin = () => {
         await axios.delete(`http://localhost:8000/course/delete/${id}`, {
           headers: getAuthHeader(),
         });
+        setRefresh((prev) => !prev);
       } catch (err) {
         setError("Erro ao deletar curso.");
       }
@@ -106,6 +110,7 @@ const useAdmin = () => {
         await axios.delete(`http://localhost:8000/event/delete/${id}`, {
           headers: getAuthHeader(),
         });
+        setRefresh((prev) => !prev);
       } catch (err) {
         setError("Erro ao deletar evento.");
       }
@@ -119,6 +124,7 @@ const useAdmin = () => {
         await axios.post("http://localhost:8000/event/create", newEvent, {
           headers: getAuthHeader(),
         });
+        setRefresh((prev) => !prev);
       } catch (err) {
         setError("Erro ao adicionar evento.");
       }
@@ -132,6 +138,7 @@ const useAdmin = () => {
         await axios.post("http://localhost:8000/course/create", newCourse, {
           headers: getAuthHeader(),
         });
+        setRefresh((prev) => !prev);
       } catch (err) {
         setError("Erro ao adicionar curso.");
       }
@@ -149,6 +156,7 @@ const useAdmin = () => {
             headers: getAuthHeader(),
           }
         );
+        setRefresh((prev) => !prev);
       } catch (err) {
         setError("Erro ao atualizar evento.");
       }
@@ -166,6 +174,7 @@ const useAdmin = () => {
             headers: getAuthHeader(),
           }
         );
+        setRefresh((prev) => !prev);
       } catch (err) {
         setError("Erro ao atualizar curso.");
       }
@@ -178,7 +187,7 @@ const useAdmin = () => {
     fetchCourses();
     fetchEvents();
     fetchRegistrations();
-  }, [fetchUsers, fetchCourses, fetchEvents, fetchRegistrations]);
+  }, [fetchUsers, fetchCourses, fetchEvents, fetchRegistrations, refresh]);
 
   return {
     users,

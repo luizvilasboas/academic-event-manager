@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 
 const useCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -7,9 +7,10 @@ const useCourses = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fetched, setFetched] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   const getAuthToken = () => {
-    return localStorage.getItem('token');
+    return localStorage.getItem("token");
   };
 
   const getAuthHeader = useCallback(() => {
@@ -22,7 +23,7 @@ const useCourses = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/course/list', {
+      const response = await axios.get("http://localhost:8000/course/list", {
         headers: getAuthHeader(),
       });
       setCourses(response.data);
@@ -35,26 +36,33 @@ const useCourses = () => {
     }
   }, [fetched, getAuthHeader]);
 
-  const getCourse = useCallback(async (id) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`http://localhost:8000/course/${id}`, {
-        headers: getAuthHeader(),
-      });
-      setCourse(response.data);
-      setError(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [getAuthHeader]);
+  const getCourse = useCallback(
+    async (id) => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`http://localhost:8000/course/${id}`, {
+          headers: getAuthHeader(),
+        });
+        setCourse(response.data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [getAuthHeader]
+  );
 
   useEffect(() => {
     if (!fetched) {
       listCourses();
     }
-  }, [fetched, listCourses]);
+  }, [listCourses, refresh]);
+
+  const triggerRefresh = () => {
+    setRefresh((prev) => !prev);
+  };
 
   return {
     courses,
@@ -62,6 +70,7 @@ const useCourses = () => {
     loading,
     error,
     getCourse,
+    triggerRefresh,
   };
 };
 

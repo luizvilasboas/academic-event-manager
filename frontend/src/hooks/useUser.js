@@ -7,20 +7,14 @@ const useUser = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [fetched, setFetched] = useState(false);
-
-  const getAuthToken = () => {
-    return localStorage.getItem("token");
-  };
+  const [refresh, setRefresh] = useState(false);
 
   const getAuthHeader = useCallback(() => {
-    const token = getAuthToken();
+    const token = localStorage.getItem("token");
     return token ? { Authorization: `Bearer ${token}` } : {};
   }, []);
 
   const fetchUserInfo = useCallback(async () => {
-    if (fetched) return;
-
     setLoading(true);
     try {
       const config = {
@@ -43,16 +37,15 @@ const useUser = () => {
         config
       );
 
-      setError(null);
       setCourses(coursesData);
       setEvents(eventsData);
-      setFetched(true);
+      setError(null);
     } catch (err) {
       setError("Erro ao carregar as informações do usuário.");
     } finally {
       setLoading(false);
     }
-  }, [fetched, getAuthHeader]);
+  }, [getAuthHeader]);
 
   const updateUser = async (updatedData) => {
     try {
@@ -64,13 +57,14 @@ const useUser = () => {
       };
 
       const response = await axios.patch(
-        "http://localhost:8000/user/me/edit",
+        `http://localhost:8000/user/${updatedData.id}`,
         updatedData,
         config
       );
 
       if (response.status === 200) {
         setUser(response.data);
+        setRefresh((prev) => !prev);
         return { status: true, text: "Perfil atualizado com sucesso." };
       }
     } catch (err) {
@@ -85,10 +79,8 @@ const useUser = () => {
   };
 
   useEffect(() => {
-    if (!fetched) {
-      fetchUserInfo();
-    }
-  }, [fetched, fetchUserInfo]);
+    fetchUserInfo();
+  }, [fetchUserInfo, refresh]);
 
   return {
     user,

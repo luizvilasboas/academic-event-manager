@@ -7,6 +7,7 @@ const useEvent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fetched, setFetched] = useState(false);
+  const [refresh, setRefresh] = useState(false);
 
   const getAuthToken = () => {
     return localStorage.getItem("token");
@@ -35,26 +36,33 @@ const useEvent = () => {
     }
   }, [fetched, getAuthHeader]);
 
-  const getEvent = useCallback(async (id) => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`http://localhost:8000/event/${id}`, {
-        headers: getAuthHeader(),
-      });
-      setEvent(response.data);
-      setError(null);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [getAuthHeader]);
+  const getEvent = useCallback(
+    async (id) => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`http://localhost:8000/event/${id}`, {
+          headers: getAuthHeader(),
+        });
+        setEvent(response.data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [getAuthHeader]
+  );
 
   useEffect(() => {
     if (!fetched) {
       listEvents();
     }
-  }, [fetched, listEvents]);
+  }, [listEvents, refresh, fetched]);
+
+  const triggerRefresh = () => {
+    setRefresh((prev) => !prev);
+  };
 
   return {
     events,
@@ -62,6 +70,7 @@ const useEvent = () => {
     loading,
     error,
     getEvent,
+    triggerRefresh,
   };
 };
 

@@ -13,14 +13,14 @@ class UserController
         $this->user = new User($connection);
     }
 
-    public function updateUser(int $id)
+    public function update(int $userId)
     {
         header("Content-Type: application/json");
 
         $data = json_decode(file_get_contents("php://input"), true);
 
         if (isset($data["name"], $data["email"], $data["password"])) {
-            $this->user->id = $id;
+            $this->user->id = $userId;
             $this->user->name = $data["name"];
             $this->user->email = $data["email"];
             $this->user->password = password_hash($data["password"], PASSWORD_BCRYPT);
@@ -38,11 +38,11 @@ class UserController
         }
     }
 
-    public function getUser(int $id)
+    public function get(int $userId)
     {
         header("Content-Type: application/json");
 
-        $userData = $this->user->readOne($id);
+        $userData = $this->user->readOne($userId);
 
         if ($userData) {
             unset($userData["password"]);
@@ -54,11 +54,11 @@ class UserController
         }
     }
 
-    public function deleteUser(int $id)
+    public function delete(int $userId)
     {
         header("Content-Type: application/json");
 
-        if ($this->user->delete($id)) {
+        if ($this->user->delete($userId)) {
             http_response_code(200);
             echo json_encode(["message" => "User deleted successfully"]);
         } else {
@@ -67,7 +67,7 @@ class UserController
         }
     }
 
-    public function read()
+    public function list()
     {
         header("Content-Type: application/json");
 
@@ -97,28 +97,28 @@ class UserController
         }
     }
 
-    public function getCoursesFromStudent(int $id)
+    public function getCoursesFromUser(int $userId)
     {
         header("Content-Type: application/json");
 
-        $courses = $this->user->getCoursesByUser($id);
+        $courses = $this->user->getCoursesByUser($userId);
 
         http_response_code(200);
         echo json_encode($courses);
     }
 
-    public function getEventFromStudent(int $id)
+    public function getEventFromUser(int $userId)
     {
         header("Content-Type: application/json");
 
-        if (!$id) {
+        if (!$userId) {
             http_response_code(400);
             echo json_encode(["message" => "Student ID is required"]);
             return;
         }
 
         try {
-            $events = $this->user->getEventsByUser($id);
+            $events = $this->user->getEventsByUser($userId);
 
             http_response_code(200);
             echo json_encode($events);

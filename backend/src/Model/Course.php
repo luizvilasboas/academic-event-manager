@@ -20,9 +20,8 @@ class Course
 
     public function create(): bool
     {
-        $sql = "INSERT INTO " . $this->table . " (event_id, title, description, start_time, end_time) VALUES (:event_id, :title, :description, :start_time, :end_time)";
+        $sql = "INSERT INTO {$this->table} (event_id, title, description, start_time, end_time) VALUES (:event_id, :title, :description, :start_time, :end_time)";
         $stmt = $this->connection->prepare($sql);
-
         $stmt->bindParam(":event_id", $this->event_id);
         $stmt->bindParam(":title", $this->title);
         $stmt->bindParam(":description", $this->description);
@@ -34,7 +33,7 @@ class Course
 
     public function readAll(): array
     {
-        $sql = "SELECT * FROM " . $this->table;
+        $sql = "SELECT * FROM {$this->table}";
         $stmt = $this->connection->query($sql);
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -42,7 +41,7 @@ class Course
 
     public function readOne(int $id): array
     {
-        $sql = "SELECT * FROM " . $this->table . " WHERE id = :id";
+        $sql = "SELECT * FROM {$this->table} WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(":id", $id);
         $stmt->execute();
@@ -52,9 +51,8 @@ class Course
 
     public function update(int $id): bool
     {
-        $sql = "UPDATE " . $this->table . " SET event_id = :event_id, title = :title, description = :description, start_time = :start_time, end_time = :end_time WHERE id = :id";
+        $sql = "UPDATE {$this->table} SET event_id = :event_id, title = :title, description = :description, start_time = :start_time, end_time = :end_time WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
-
         $stmt->bindParam(":event_id", $this->event_id);
         $stmt->bindParam(":title", $this->title);
         $stmt->bindParam(":description", $this->description);
@@ -67,7 +65,7 @@ class Course
 
     public function delete(int $id): bool
     {
-        $sql = "DELETE FROM " . $this->table . " WHERE id = :id";
+        $sql = "DELETE FROM {$this->table} WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(":id", $id);
 
@@ -76,14 +74,11 @@ class Course
 
     public function getCoursesByUser(int $userId): array
     {
-        $sql = "SELECT c.event_id AS id, c.title, c.description, c.start_time, c.end_time
-                FROM {$this->table} c
-                JOIN registrations r ON c.id = r.course_id
-                WHERE r.student_id = :user_id";
+        $sql = "SELECT c.event_id AS id, c.title, c.description, c.start_time, c.end_time FROM {$this->table} c JOIN registrations r ON c.id = r.course_id WHERE r.student_id = :user_id";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(":user_id", $userId, \PDO::PARAM_INT);
         $stmt->execute();
-    
+
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }    
+    }
 }

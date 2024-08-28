@@ -56,6 +56,42 @@ CREATE TABLE scores (
     FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Trigger para adicionar pontos automaticamente
+CREATE TRIGGER add_points_after_registration
+AFTER INSERT ON registrations
+FOR EACH ROW
+BEGIN
+    IF (SELECT COUNT(*) FROM scores WHERE student_id = NEW.student_id) = 0 THEN
+        INSERT INTO scores (student_id, points)
+        VALUES (NEW.student_id, 10);
+    ELSE
+        UPDATE scores
+        SET points = points + 10
+        WHERE student_id = NEW.student_id;
+    END IF;
+END;
+
+-- Trigger para remover pontos automaticamente
+CREATE TRIGGER subtract_points_after_unregistration
+AFTER DELETE ON registrations
+FOR EACH ROW
+BEGIN
+    IF (SELECT COUNT(*) FROM scores WHERE student_id = OLD.student_id) > 0 THEN
+        UPDATE scores
+        SET points = GREATEST(points - 10, 0)
+        WHERE student_id = OLD.student_id;
+    END IF;
+END;
+
+-- Trigger para adicionar valor inicial no scores
+CREATE TRIGGER set_initial_points_after_user_creation
+AFTER INSERT ON users
+FOR EACH ROW
+BEGIN
+    INSERT INTO scores (student_id, points)
+    VALUES (NEW.id, 0);
+END;
+
 -- Trigger para prevenir conflitos de horário
 CREATE TRIGGER prevent_time_conflict
 BEFORE INSERT ON registrations
@@ -76,27 +112,9 @@ BEGIN
     END IF;
 END;
 
--- View para relatórios
--- Relatório de todos os usuários cadastrados
-CREATE VIEW report_users AS
-SELECT id, name, email, created_at FROM users;
-
--- Relatório de todos os eventos e cursos cadastrados
-CREATE VIEW report_events_courses AS
-SELECT e.id AS event_id, e.name AS event_name, c.id AS course_id, c.title AS course_title
-FROM events e
-LEFT JOIN courses c ON e.id = c.event_id;
-
--- Relatório de inscrições
-CREATE VIEW report_registrations AS
-SELECT u.name AS student_name, c.title AS course_title, r.registration_date
-FROM registrations r
-JOIN users u ON r.student_id = u.id
-JOIN courses c ON r.course_id = c.id;
-
 -- View para ranking de participação
-CREATE VIEW ranking_participation AS
-SELECT u.name, s.points
+CREATE OR REPLACE VIEW ranking_participation AS
+SELECT u.id, u.name, s.points
 FROM scores s
 JOIN users u ON s.student_id = u.id
 ORDER BY s.points DESC;

@@ -1,14 +1,17 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import useCourses from "../hooks/useCourses";
 import useUser from "../hooks/useUser";
-import { FaArrowLeft, FaCalendarAlt, FaClock } from "react-icons/fa";
+import { FaCalendarAlt, FaClock } from "react-icons/fa";
+import { useMessage } from "../context/MessageContext";
+import Alert from "../components/Alert";
 
 const CourseDetail = () => {
   const { id } = useParams();
   const { course, getCourse } = useCourses();
-  const { courses: userCourses, fetchUserInfo, registerCourse, unregisterCourse } = useUser();
+  const { courses: userCourses, registerCourse, unregisterCourse, error } = useUser();
   const [isRegistered, setIsRegistered] = useState(false);
+  const { message, setMessage, clearMessage } = useMessage();
 
   const checkRegistrationStatus = useCallback(() => {
     if (userCourses && id) {
@@ -25,17 +28,25 @@ const CourseDetail = () => {
   }, [id, getCourse, checkRegistrationStatus]);
 
   const handleRegister = async () => {
-    if (isRegistered) {
-      await unregisterCourse(id);
-    } else {
-      await registerCourse(id);
+    clearMessage();
+    try {
+      if (isRegistered) {
+        await unregisterCourse(id);
+        setMessage("success", "Você foi desregistrado do curso com sucesso.");
+      } else {
+        await registerCourse(id);
+        setMessage("success", "Você foi registrado no curso com sucesso.");
+      }
+      checkRegistrationStatus();
+    } catch {
+      // Usa a mensagem de erro capturada no hook
+      setMessage("error", error || "Ocorreu um erro ao processar sua solicitação.");
     }
-
-    checkRegistrationStatus();
   };
 
   return (
-    <div className="max-w-6xl mx-auto mt-16 p-10">
+    <div className="max-w-6xl mx-auto mt-10 px-10 pb-10">
+      {message.text && <Alert type={message.type} text={message.text} />}
       {course && (
         <>
           <h2 className="text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">

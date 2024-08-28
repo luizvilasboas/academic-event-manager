@@ -58,9 +58,7 @@ const UserProfile = () => {
 
   return (
     <div className="max-w-6xl mt-10">
-      <div className="mb-10">
-        {message.text && <Alert type={message.type} text={message.text} />}
-      </div>
+      {message.text && <Alert type={message.type} text={message.text} />}
       <div className="flex justify-between items-center mb-12">
         <h2 className="text-5xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
           Perfil do Usuário

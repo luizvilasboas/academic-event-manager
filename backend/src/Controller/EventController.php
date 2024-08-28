@@ -38,7 +38,7 @@ class EventController
         }
     }
 
-    public function read()
+    public function list()
     {
         header("Content-Type: application/json");
 
@@ -59,7 +59,7 @@ class EventController
         echo json_encode($events_arr);
     }
 
-    public function update(int $id)
+    public function update(int $eventId)
     {
         header("Content-Type: application/json");
 
@@ -71,7 +71,7 @@ class EventController
             $this->event->start_time = $data["start_time"];
             $this->event->end_time = $data["end_time"];
 
-            if ($this->event->update((int) $id)) {
+            if ($this->event->update((int) $eventId)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Event updated successfully"]);
             } else {
@@ -84,12 +84,12 @@ class EventController
         }
     }
 
-    public function delete(int $id)
+    public function delete(int $eventId)
     {
         header("Content-Type: application/json");
 
-        if ($id) {
-            if ($this->event->delete((int) $id)) {
+        if ($eventId) {
+            if ($this->event->delete((int) $eventId)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Event deleted successfully"]);
             } else {
@@ -102,18 +102,18 @@ class EventController
         }
     }
 
-    public function getEventById(int $id)
+    public function get(int $eventId)
     {
         header("Content-Type: application/json");
 
-        if (!$id) {
+        if (!$eventId) {
             http_response_code(400);
             echo json_encode(["message" => "Event ID is required"]);
             return;
         }
 
         try {
-            $event = $this->event->getByIdWithCourses($id);
+            $event = $this->event->getByIdWithCourses($eventId);
 
             if (!$event) {
                 http_response_code(404);

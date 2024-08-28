@@ -42,7 +42,7 @@ class CourseController
         }
     }
 
-    public function read()
+    public function list()
     {
         header("Content-Type: application/json");
 
@@ -52,7 +52,7 @@ class CourseController
         echo json_encode($courses);
     }
 
-    public function update(int $id)
+    public function update(int $courseId)
     {
         header("Content-Type: application/json");
 
@@ -65,7 +65,7 @@ class CourseController
             $this->course->start_time = $data["start_time"];
             $this->course->end_time = $data["end_time"];
 
-            if ($this->course->update((int) $id)) {
+            if ($this->course->update((int) $courseId)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Course updated successfully"]);
             } else {
@@ -78,12 +78,12 @@ class CourseController
         }
     }
 
-    public function delete(int $id)
+    public function delete(int $courseId)
     {
         header("Content-Type: application/json");
 
-        if ($id) {
-            if ($this->course->delete((int) $id)) {
+        if ($courseId) {
+            if ($this->course->delete((int) $courseId)) {
                 http_response_code(200);
                 echo json_encode(["message" => "Course deleted successfully"]);
             } else {
@@ -99,21 +99,31 @@ class CourseController
     public function register(int $studentId, int $courseId)
     {
         header("Content-Type: application/json");
-
+    
         $data = json_decode(file_get_contents("php://input"), true);
-
+    
         $this->registration->student_id = $studentId;
         $this->registration->course_id = $courseId;
-
-        if ($this->registration->register()) {
-            http_response_code(201);
-            echo json_encode(["message" => "registerment successful"]);
-        } else {
-            http_response_code(500);
-            echo json_encode(["message" => "Failed to register"]);
+    
+        try {
+            if ($this->registration->register()) {
+                http_response_code(201);
+                echo json_encode(["message" => "Registration successful"]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["message" => "Failed to register"]);
+            }
+        } catch (\PDOException $e) {
+            if ($e->getCode() == '45000') {
+                http_response_code(400);
+                echo json_encode(["message" => "Time conflict detected. Cannot register for this course."]);
+            } else {
+                http_response_code(500);
+                echo json_encode(["message" => "An error occurred: " . $e->getMessage()]);
+            }
         }
-
     }
+    
 
     public function unregister(int $studentId, int $courseId)
     {
@@ -131,18 +141,18 @@ class CourseController
         }
     }
 
-    public function getCourseById(int $id)
+    public function get(int $courseId)
     {
         header("Content-Type: application/json");
     
-        if (!$id) {
+        if (!$courseId) {
             http_response_code(400);
             echo json_encode(["message" => "Course ID is required"]);
             return;
         }
     
         try {
-            $course = $this->course->readOne($id);
+            $course = $this->course->readOne($courseId);
     
             if (!$course) {
                 http_response_code(404);

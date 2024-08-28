@@ -103,7 +103,7 @@ function handleEvent($segments, $method, $connection)
     $id = $segments[2] ?? null;
 
     if ($segments[1] === "list") {
-        $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+        $method === "GET" ? $controller->list() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
         return;
     }
 
@@ -112,7 +112,7 @@ function handleEvent($segments, $method, $connection)
     }
 
     if (is_numeric($segments[1])) {
-        $method === "GET" ? $controller->getEventById((int) $segments[1]) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+        $method === "GET" ? $controller->get((int) $segments[1]) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
     } else {
         match ($segments[1]) {
             "create" => $method === "POST" ? $controller->create() : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
@@ -134,7 +134,7 @@ function handleCourse($segments, $method, $connection)
     $controller = new CourseController($connection);
 
     if ($segments[1] === "list") {
-        $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+        $method === "GET" ? $controller->list() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
         return;
     }
 
@@ -143,7 +143,7 @@ function handleCourse($segments, $method, $connection)
     }
 
     if ($courseId && !$id) {
-        $method === "GET" ? $controller->getCourseById($courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+        $method === "GET" ? $controller->get($courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
     } else {
         match ($segments[2] ?? null) {
             "register" => $method === "POST" ? $controller->register($userId, $courseId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
@@ -166,16 +166,16 @@ function handleUser($segments, $method, $connection)
 
     if (is_numeric($segments[1])) {
         match ($method) {
-            "PATCH" => $controller->updateUser((int) $segments[1]),
-            "DELETE" => $controller->deleteUser((int) $segments[1]),
+            "PATCH" => $controller->update((int) $segments[1]),
+            "DELETE" => $controller->delete((int) $segments[1]),
             default => sendJsonResponse(405, ["message" => "Method Not Allowed"])
         };
     } else {
         match ($segments[1]) {
-            "list" => $method === "GET" ? $controller->read() : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
-            "me" => $method === "GET" ? $controller->getUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
-            "courses" => $method === "GET" ? $controller->getCoursesFromStudent($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
-            "events" => $method === "GET" ? $controller->getEventFromStudent($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "list" => $method === "GET" ? $controller->list() : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "me" => $method === "GET" ? $controller->get($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "courses" => $method === "GET" ? $controller->getCoursesFromUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
+            "events" => $method === "GET" ? $controller->getEventFromUser($userId) : sendJsonResponse(405, ["message" => "Method Not Allowed"]),
             default => sendJsonResponse(404, ["message" => "Action not found"])
         };
     }
@@ -184,7 +184,7 @@ function handleUser($segments, $method, $connection)
 function handleScores($method, $connection)
 {
     $controller = new ScoresController($connection);
-    $method === "GET" ? $controller->getScores() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
+    $method === "GET" ? $controller->list() : sendJsonResponse(405, ["message" => "Method Not Allowed"]);
 }
 
 function handleRegistration($method, $connection)

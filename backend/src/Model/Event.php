@@ -19,8 +19,8 @@ class Event
 
     public function create()
     {
-        $query = "INSERT INTO {$this->table} SET name=:name, description=:description, start_time=:start_time, end_time=:end_time";
-        $stmt = $this->connection->prepare($query);
+        $sql = "INSERT INTO {$this->table} SET name=:name, description=:description, start_time=:start_time, end_time=:end_time";
+        $stmt = $this->connection->prepare($sql);
 
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->description = htmlspecialchars(strip_tags($this->description));
@@ -41,15 +41,15 @@ class Event
 
     public function readAll(): array
     {
-        $query = "SELECT * FROM {$this->table}";
-        $stmt = $this->connection->query($query);
+        $sql = "SELECT * FROM {$this->table}";
+        $stmt = $this->connection->query($sql);
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function readOne(int $id): array
     {
-        $sql = "SELECT * FROM " . $this->table . " WHERE id = :id";
+        $sql = "SELECT * FROM {$this->table} WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(":id", $id);
         $stmt->execute();
@@ -59,9 +59,8 @@ class Event
 
     public function update(int $id): bool
     {
-        $sql = "UPDATE " . $this->table . " SET name = :name, description = :description, start_time = :start_time, end_time = :end_time WHERE id = :id";
+        $sql = "UPDATE {$this->table} SET name = :name, description = :description, start_time = :start_time, end_time = :end_time WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
-
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":description", $this->description);
         $stmt->bindParam(":start_time", $this->start_time);
@@ -73,7 +72,7 @@ class Event
 
     public function delete(int $id): bool
     {
-        $sql = "DELETE FROM " . $this->table . " WHERE id = :id";
+        $sql = "DELETE FROM {$this->table} WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(":id", $id);
 
@@ -82,9 +81,7 @@ class Event
 
     public function getByIdWithCourses(int $id): ?array
     {
-        $sql = "SELECT id, name, description, start_time, end_time 
-                FROM {$this->table} 
-                WHERE id = :id";
+        $sql = "SELECT id, name, description, start_time, end_time FROM {$this->table} WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
         $stmt->execute();
@@ -95,15 +92,11 @@ class Event
             return null;
         }
 
-        $sqlCourses = "SELECT id, title, description, start_time, end_time
-                       FROM courses
-                       WHERE event_id = :event_id";
+        $sqlCourses = "SELECT id, title, description, start_time, end_time FROM courses WHERE event_id = :event_id";
         $stmtCourses = $this->connection->prepare($sqlCourses);
         $stmtCourses->bindParam(':event_id', $id, \PDO::PARAM_INT);
         $stmtCourses->execute();
-
         $courses = $stmtCourses->fetchAll(\PDO::FETCH_ASSOC);
-
         $event['courses'] = $courses;
 
         return $event;

@@ -18,8 +18,8 @@ class User
 
     public function checkCredentials(): array|bool
     {
-        $query = "SELECT id, name, email, password, is_admin FROM {$this->table} WHERE email = :email LIMIT 0,1";
-        $stmt = $this->connection->prepare($query);
+        $sql = "SELECT id, name, email, password, is_admin FROM {$this->table} WHERE email = :email LIMIT 0,1";
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(":email", $this->email);
         $stmt->execute();
 
@@ -34,8 +34,8 @@ class User
 
     public function create()
     {
-        $query = "INSERT INTO {$this->table} (name, email, password) VALUES (:name, :email, :password)";
-        $stmt = $this->connection->prepare($query);
+        $sql = "INSERT INTO {$this->table} (name, email, password) VALUES (:name, :email, :password)";
+        $stmt = $this->connection->prepare($sql);
 
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->email = htmlspecialchars(strip_tags($this->email));
@@ -54,9 +54,8 @@ class User
 
     public function update(): bool
     {
-        $sql = "UPDATE " . $this->table . " SET name = :name, email = :email, password = :password WHERE id = :id";
+        $sql = "UPDATE {$this->table} SET name = :name, email = :email, password = :password WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
-
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":password", $this->password);
@@ -67,8 +66,8 @@ class User
 
     public function delete(int $id): bool
     {
-        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
-        $stmt = $this->connection->prepare($query);
+        $sql = "DELETE FROM {$this->table} WHERE id = :id";
+        $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(":id", $id, \PDO::PARAM_INT);
 
         return $stmt->execute();
@@ -76,7 +75,7 @@ class User
 
     public function readOne(int $id): array
     {
-        $sql = "SELECT * FROM " . $this->table . " WHERE id = :id";
+        $sql = "SELECT * FROM {$this->table} WHERE id = :id";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(":id", $id);
         $stmt->execute();
@@ -86,7 +85,7 @@ class User
 
     public function readAll(): array
     {
-        $sql = "SELECT id, name, email FROM " . $this->table;
+        $sql = "SELECT id, name, email FROM {$this->table}";
         $stmt = $this->connection->prepare($sql);
         $stmt->execute();
 
@@ -95,21 +94,8 @@ class User
 
     public function getUsersWithCourses(): array
     {
-        $query = "
-            SELECT 
-                u.id AS user_id, u.name AS user_name, u.email AS user_email,
-                c.id AS course_id, c.title AS course_title, c.description AS course_description
-            FROM 
-                {$this->table} u
-            LEFT JOIN 
-                registrations r ON u.id = r.student_id
-            LEFT JOIN 
-                courses c ON r.course_id = c.id
-            ORDER BY 
-                u.name ASC, c.title ASC
-        ";
-
-        $stmt = $this->connection->prepare($query);
+        $sql = "SELECT u.id AS user_id, u.name AS user_name, u.email AS user_email, c.id AS course_id, c.title AS course_title, c.description AS course_description FROM {$this->table} u LEFT JOIN registrations r ON u.id = r.student_id LEFT JOIN courses c ON r.course_id = c.id ORDER BY u.name ASC, c.title ASC";
+        $stmt = $this->connection->prepare($sql);
         $stmt->execute();
 
         $usersWithCourses = [];
@@ -137,10 +123,7 @@ class User
 
     public function getCoursesByUser(int $userId): array
     {
-        $sql = "SELECT c.id AS id, c.title, c.description, c.start_time, c.end_time
-                FROM courses c
-                JOIN registrations r ON c.id = r.course_id
-                WHERE r.student_id = :user_id";
+        $sql = "SELECT c.id AS id, c.title, c.description, c.start_time, c.end_time FROM courses c JOIN registrations r ON c.id = r.course_id WHERE r.student_id = :user_id";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(":user_id", $userId, \PDO::PARAM_INT);
         $stmt->execute();
@@ -150,12 +133,7 @@ class User
 
     public function getEventsByUser($userId): array
     {
-        $sql = "SELECT DISTINCT e.id, e.name, e.description
-                FROM events e
-                JOIN courses c ON e.id = c.event_id
-                JOIN registrations r ON c.id = r.course_id
-                WHERE r.student_id = :user_id";
-
+        $sql = "SELECT DISTINCT e.id, e.name, e.description FROM events e JOIN courses c ON e.id = c.event_id JOIN registrations r ON c.id = r.course_id WHERE r.student_id = :user_id";
         $stmt = $this->connection->prepare($sql);
         $stmt->bindParam(":user_id", $userId, \PDO::PARAM_INT);
         $stmt->execute();

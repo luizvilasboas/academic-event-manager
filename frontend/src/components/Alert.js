@@ -11,7 +11,7 @@ const Alert = ({ type, text }) => {
   const title = type === "error" ? "Erro" : "Sucesso";
 
   return (
-    <div role="alert" className="mb-4">
+    <div role="alert" className="mb-10">
       <div
         className={`flex justify-between ${bgColor} text-white font-bold rounded-t px-4 py-2`}
       >

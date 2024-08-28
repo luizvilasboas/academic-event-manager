@@ -12,15 +12,10 @@ class Scores
         $this->connection = $database;
     }
 
-    public function getAllScores()
+    public function readAll()
     {
-        $query = "SELECT u.id, u.name, s.points
-                  FROM {$this->table} s 
-                  JOIN users u 
-                  ON s.student_id = u.id 
-                  ORDER BY s.points DESC";
-
-        $stmt = $this->connection->prepare($query);
+        $sql = "SELECT * FROM ranking_participation";
+        $stmt = $this->connection->prepare($sql);
         $stmt->execute();
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);

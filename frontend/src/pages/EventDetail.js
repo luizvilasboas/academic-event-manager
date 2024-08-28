@@ -29,7 +29,7 @@ const EventDetail = () => {
               <div>
                 <h4 className="text-lg font-semibold">Data de Início</h4>
                 <p className="text-gray-700">
-                  {event.start_date || "A definir"}
+                  {event.start_time || "A definir"}
                 </p>
               </div>
             </div>
@@ -37,7 +37,7 @@ const EventDetail = () => {
               <FaClock className="text-purple-500 w-8 h-8 mr-4" />
               <div>
                 <h4 className="text-lg font-semibold">Data de término</h4>
-                <p className="text-gray-700">{event.end_date || "A definir"}</p>
+                <p className="text-gray-700">{event.end_time || "A definir"}</p>
               </div>
             </div>
           </div>
@@ -47,7 +47,8 @@ const EventDetail = () => {
               <h3 className="text-3xl font-semibold mb-6">Cursos Associados</h3>
               <div className="flex gap-8">
                 {event.courses.map((course, index) => (
-                  <div
+                  <Link
+                    to={`/courses/${course.id}`}
                     key={index}
                     className="bg-white p-6 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300"
                   >
@@ -56,13 +57,7 @@ const EventDetail = () => {
                       <h4 className="text-xl font-semibold">{course.title}</h4>
                     </div>
                     <p className="text-gray-700">{course.description}</p>
-                    <Link
-                      to={`/course/${course.id}/register`}
-                      className="mt-4 inline-block px-6 py-2 bg-gradient-to-r from-green-400 to-blue-500 text-white rounded-full shadow-md hover:scale-105 transform transition-transform duration-300"
-                    >
-                      Inscrever-se
-                    </Link>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>

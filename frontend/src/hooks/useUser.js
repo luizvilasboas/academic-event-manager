@@ -92,7 +92,13 @@ const useUser = () => {
         setError(null);
         setRefresh((prev) => !prev);
       } catch (err) {
-        setError(err.message);
+        if (err.response && err.response.data && err.response.data.message) {
+          // Captura a mensagem específica do backend
+          setError(err.response.data.message);
+        } else {
+          setError("Erro ao registrar no curso.");
+        }
+        throw err; // Propaga o erro para ser tratado no componente
       } finally {
         setLoading(false);
       }
@@ -113,7 +119,11 @@ const useUser = () => {
         setError(null);
         setRefresh((prev) => !prev);
       } catch (err) {
-        setError(err.message);
+        if (err.response && err.response.data && err.response.data.message) {
+          setError(err.response.data.message);
+        } else {
+          setError("Erro ao desregistrar do curso.");
+        }
       } finally {
         setLoading(false);
       }
@@ -133,7 +143,7 @@ const useUser = () => {
     error,
     updateUser,
     registerCourse,
-    unregisterCourse
+    unregisterCourse,
   };
 };
 

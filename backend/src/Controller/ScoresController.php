@@ -3,7 +3,6 @@
 namespace Olooeez\AcademicEventManager\Controller;
 
 use Olooeez\AcademicEventManager\Model\Scores;
-use Olooeez\AcademicEventManager\Model\Registration;
 
 class ScoresController
 {
@@ -14,12 +13,12 @@ class ScoresController
         $this->scores = new Scores($connection);
     }
 
-    public function getScores()
+    public function list()
     {
         header("Content-Type: application/json");
 
         try {
-            $scores = $this->scores->getAllScores();
+            $scores = $this->scores->readAll();
 
             if (empty($scores)) {
                 http_response_code(404);

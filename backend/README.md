@@ -1,21 +1,27 @@
-### Frontend
+### backend
 
-1. Navegue para o diretório do frontend:
-
-   ```
-   cd frontend
-   ```
-
-2. Instale as dependências do projeto:
+1. Navegue para o diretório do backend:
 
    ```
-   npm install
+   cd backend
    ```
 
-3. Inicie o servidor de desenvolvimento:
+2. Configure o banco de dados:
+
+   - Crie o banco de dados e tabelas usando o script SQL fornecido no projeto (`scripts/generate.sql`).
+   - Suba o banco de dados com o (`docker-compose.yaml`).
+   - Rode os comandos dentro do (`scripts/fake.sql`) para gerar dados falsos.
+
+3. Instale as dependências do PHP:
 
    ```
-   npm start
+   composer install
+   ```
+
+4. Rode o servidor do PHP:
+
+   ```
+   php -S localhost:8000 -t public
    ```
 
 ## Contribuindo

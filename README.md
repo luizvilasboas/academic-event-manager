@@ -45,7 +45,7 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 
 ## Instalação
 
-- Olhe os README.md, tanto para o [backend](https://gitlab.com/olooeez/academic-event-manager/-/blob/main/backend/README.md), tanto para o [frontend](https://gitlab.com/olooeez/academic-event-manager/-/blob/main/frontend/README.md) para rodar o projeto.
+- Olhe os README.md, tanto para o [backend](https://github.com/luizvilasboas/academic-event-manager/tree/main/backend), tanto para o [frontend](https://github.com/luizvilasboas/academic-event-manager/tree/main/frontend) para rodar o projeto.
 
 ## Uso
 
@@ -125,4 +125,4 @@ Contribuições são bem-vindas! Siga os passos abaixo para contribuir:
 
 ## Licença
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](https://gitlab.com/olooeez/academic-event-manager/-/blob/main/LICENSE) para mais detalhes.
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](https://github.com/luizvilasboas/academic-event-manager/blob/main/LICENSE) para mais detalhes.

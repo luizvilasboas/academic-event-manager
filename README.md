@@ -1,128 +1,112 @@
 # academic-event-manager
 
-Este é um sistema de gerenciamento de eventos acadêmicos desenvolvido em PHP e React, com banco de dados MySQL. O sistema permite que usuários se registrem, participem de cursos e eventos, e acumulem pontos com base na sua participação.
+> An academic event management system developed in PHP and React. It allows users to register for courses, participate in events, and earn points based on their participation.
 
-## Tabela de Conteúdos
+## About the Project
 
-- [Visão Geral](#visão-geral)
-- [Funcionalidades](#funcionalidades)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Configuração do Ambiente](#configuração-do-ambiente)
-- [Instalação](#instalação)
-- [Uso](#uso)
-- [Endpoints da API](#endpoints-da-api)
-- [Trigger e Views](#trigger-e-views)
-- [Contribuindo](#contribuindo)
-- [Licença](#licença)
+This project was created to manage academic events, allowing the administration of users, courses, and events. Users can register for courses, earn points, and view detailed reports on their participation.
 
-## Visão Geral
+Key features include:
+*   **User Management:** Create, edit, and delete users with administrative privileges.
+*   **Event & Course Management:** Add, update, and remove events and their associated courses.
+*   **Course Registration:** Users can register and unregister from courses, with validation to prevent schedule conflicts.
+*   **Scoring System:** Users accumulate points for registering in courses and lose points for unregistering.
+*   **Reports & Ranking:** Detailed reports for users, events, courses, and participation, including a ranking system based on accumulated points.
 
-O sistema foi criado para gerenciar eventos acadêmicos, permitindo a administração de usuários, cursos, e eventos. Usuários podem se registrar em cursos, ganhar pontos, e visualizar relatórios detalhados sobre suas participações.
+## Tech Stack
 
-## Funcionalidades
+The main technologies and libraries used in this project are:
 
-- **Gerenciamento de Usuários:** Criação, edição e exclusão de usuários com privilégios administrativos.
-- **Gerenciamento de Eventos e Cursos:** Adição, atualização e remoção de eventos e cursos associados.
-- **Registro e Desregistro de Cursos:** Usuários podem se registrar e desregistrar de cursos, com validações para evitar conflitos de horário.
-- **Sistema de Pontuação:** Usuários acumulam pontos ao se registrar em cursos e perdem pontos ao se desregistrar.
-- **Relatórios e Ranking:** Relatórios detalhados de usuários, eventos, cursos, e participações, com um ranking baseado em pontos acumulados.
+*   **Backend:** [PHP](https://www.php.net/), [MySQL](https://www.mysql.com/), [Composer](https://getcomposer.org/)
+*   **Frontend:** [React](https://react.dev/), [Axios](https://axios-http.com/), [React Router](https://reactrouter.com/), [React Icons](https://react-icons.github.io/react-icons/)
+*   **Environment:** [Node.js](https://nodejs.org/)
 
-## Tecnologias Utilizadas
+## Usage
 
-- **Backend:** PHP com MySQL para gerenciamento de dados e lógica de negócios.
-- **Frontend:** React para interface de usuário com estilização CSS.
-- **Bibliotecas:** Axios para requisições HTTP, React Router para navegação, React Icons para ícones visuais.
+Below are the instructions for you to set up and run the project locally.
 
-## Configuração do Ambiente
+### Prerequisites
 
-Certifique-se de ter as seguintes ferramentas instaladas:
+You need to have the following software installed to run this project:
 
-- **PHP**: Versão 7.4 ou superior
-- **MySQL**: Versão 5.7 ou superior
-- **Node.js**: Versão 14 ou superior
-- **Composer**: Para gerenciar dependências PHP
-- **npm**: Para gerenciar pacotes do Node.js
+*   [PHP](https://www.php.net/manual/en/install.php) (v7.4 or higher)
+*   [MySQL](https://dev.mysql.com/doc/refman/8.0/en/installing.html) (v5.7 or higher)
+*   [Node.js](https://nodejs.org/en/download) (v14 or higher)
+*   [Composer](https://getcomposer.org/download/)
+*   [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) (comes with Node.js)
 
-## Instalação
+### Installation and Setup
 
-- Olhe os README.md, tanto para o [backend](https://github.com/luizvilasboas/academic-event-manager/tree/main/backend), tanto para o [frontend](https://github.com/luizvilasboas/academic-event-manager/tree/main/frontend) para rodar o projeto.
+This project is divided into a `backend` and a `frontend` directory. Please refer to the `README.md` file inside each directory for specific installation and setup instructions.
 
-## Uso
+*   [Backend README](https://github.com/luizvilasboas/academic-event-manager/tree/main/backend)
+*   [Frontend README](https://github.com/luizvilasboas/academic-event-manager/tree/main/frontend)
 
-1. Acesse o backend pela URL configurada (ex: `http://localhost:8000`).
-2. Acesse o frontend pela URL padrão do React (ex: `http://localhost:3000`).
+### Workflow
 
-Aqui está a seção revisada de "Endpoints da API" do `README.md`, baseada nas rotas definidas no seu código PHP:
+1.  Access the backend at the configured URL (e.g., `http://localhost:8000`).
+2.  Access the frontend at the default React URL (e.g., `http://localhost:3000`).
 
-## Endpoints da API
+## API Endpoints
 
-### Autenticação
+### Authentication
+- `POST /auth/login`: Logs in a user.
+- `POST /auth/register`: Registers a new user.
 
-- `POST /auth/login`: Realiza o login de um usuário.
-- `POST /auth/register`: Registra um novo usuário.
+### Events
+- `GET /event/list`: Lists all events.
+- `GET /event/{id}`: Returns details for a specific event (admins only).
+- `POST /event/create`: Creates a new event (admins only).
+- `PATCH /event/update/{id}`: Updates event details (admins only).
+- `DELETE /event/delete/{id}`: Deletes an event (admins only).
 
-### Eventos
+### Courses
+- `GET /course/list`: Lists all courses.
+- `GET /course/{id}`: Returns details for a specific course.
+- `POST /course/create`: Creates a new course (admins only).
+- `PATCH /course/update/{id}`: Updates course details (admins only).
+- `DELETE /course/delete/{id}`: Deletes a course (admins only).
+- `POST /course/{courseId}/register`: Registers the authenticated user in a specific course.
+- `DELETE /course/{courseId}/unregister`: Unregisters the authenticated user from a specific course.
 
-- `GET /event/list`: Lista todos os eventos.
-- `GET /event/{id}`: Retorna os detalhes de um evento específico (apenas administradores).
-- `POST /event/create`: Cria um novo evento (apenas administradores).
-- `PATCH /event/update/{id}`: Atualiza os detalhes de um evento (apenas administradores).
-- `DELETE /event/delete/{id}`: Exclui um evento (apenas administradores).
+### Users
+- `GET /user/list`: Lists all users.
+- `GET /user/me`: Returns details of the authenticated user.
+- `PATCH /user/{id}`: Updates details for a specific user.
+- `DELETE /user/{id}`: Deletes a specific user.
+- `GET /user/courses`: Lists courses associated with the authenticated user.
+- `GET /user/events`: Lists events associated with the authenticated user.
 
-### Cursos
+### Scores
+- `GET /scores`: Lists the scores of all users.
 
-- `GET /course/list`: Lista todos os cursos.
-- `GET /course/{id}`: Retorna os detalhes de um curso específico.
-- `POST /course/create`: Cria um novo curso (apenas administradores).
-- `PATCH /course/update/{id}`: Atualiza os detalhes de um curso (apenas administradores).
-- `DELETE /course/delete/{id}`: Exclui um curso (apenas administradores).
-- `POST /course/{courseId}/register`: Registra o usuário autenticado em um curso específico.
-- `DELETE /course/{courseId}/unregister`: Desregistra o usuário autenticado de um curso específico.
+### Registrations
+- `GET /registration`: Lists all users with their associated courses.
 
-### Usuários
-
-- `GET /user/list`: Lista todos os usuários.
-- `GET /user/me`: Retorna os detalhes do usuário autenticado.
-- `PATCH /user/{id}`: Atualiza os detalhes de um usuário específico.
-- `DELETE /user/{id}`: Exclui um usuário específico.
-- `GET /user/courses`: Lista os cursos associados ao usuário autenticado.
-- `GET /user/events`: Lista os eventos associados ao usuário autenticado.
-
-### Pontuações
-
-- `GET /scores`: Lista as pontuações de todos os usuários.
-
-### Inscrições
-
-- `GET /registration`: Lista todos os usuários com seus cursos associados.
-
-## Notas
-
-- **Autorização**: A maioria dos endpoints requer um token JWT válido no cabeçalho de autorização (`Authorization: Bearer <token>`).
-- **Administração**: Alguns endpoints são restritos a administradores e verificarão o nível de acesso do usuário autenticado.
-
-## Trigger e Views
+## Database Details
 
 ### Triggers
-
-- **Adicionar Pontos Após Registro:** Adiciona 10 pontos para o usuário ao registrar em um curso.
-- **Subtrair Pontos Após Desregistro:** Subtrai 10 pontos quando o usuário desregistra de um curso.
-- **Inicializar Pontuação do Usuário:** Define a pontuação inicial como 0 ao criar um novo usuário.
+- **Add Points on Registration:** Adds 10 points to a user upon registering for a course.
+- **Subtract Points on Unregistration:** Subtracts 10 points when a user unregisters from a course.
+- **Initialize User Score:** Sets the initial score to 0 when a new user is created.
 
 ### Views
+- **Participation Ranking:** Displays a user ranking based on their score.
 
-- **Ranking de Participação:** Mostra o ranking de usuários baseado na pontuação.
+## Contributing
 
-## Contribuindo
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-Contribuições são bem-vindas! Siga os passos abaixo para contribuir:
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 
-1. Fork o repositório.
-2. Crie uma nova branch (`git checkout -b feature/nova-funcionalidade`).
-3. Faça commit das suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`).
-4. Faça push para a branch (`git push origin feature/nova-funcionalidade`).
-5. Abra um Pull Request.
+Don't forget to give the project a star! Thanks again!
 
-## Licença
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](https://github.com/luizvilasboas/academic-event-manager/blob/main/LICENSE) para mais detalhes.
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
